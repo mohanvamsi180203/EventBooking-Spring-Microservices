@@ -1,0 +1,7 @@
+package com.reportanalytics.service.client;
+@FeignClient(name = "BOOKING-SERVICE")
+public interface BookingClient {
+
+    @GetMapping("/api/booking/view")
+    List<BookingDto> viewAll();
+}

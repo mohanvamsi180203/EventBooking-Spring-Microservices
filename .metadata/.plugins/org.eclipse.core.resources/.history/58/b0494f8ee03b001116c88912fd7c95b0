@@ -1,0 +1,15 @@
+@Entity
+public class Payment {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer paymentId;
+
+    private Integer bookingId;
+    private String razorpayOrderId;
+    private String razorpayPaymentId;
+    private Double amount;
+    private String paymentStatus;
+    private LocalDateTime paymentDate;
+    private String paymentMethod;
+}

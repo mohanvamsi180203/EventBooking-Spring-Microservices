@@ -1,0 +1,12 @@
+package com.seat.service.dto;
+@Data
+public class SeatCreateRequest {
+
+    private Integer eventId;
+
+    private Integer totalRows;
+
+    private Integer totalColumns;
+
+    private Double price;
+}

@@ -1,0 +1,6 @@
+@FeignClient(name = "NOTIFICATION-SERVICE")
+public interface NotificationClient {
+
+    @PostMapping("/api/notification/send")
+    Object sendNotification(@RequestBody NotificationDto notification);
+}

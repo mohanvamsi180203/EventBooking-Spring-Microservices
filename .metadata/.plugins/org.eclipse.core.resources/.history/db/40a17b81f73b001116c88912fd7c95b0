@@ -1,0 +1,113 @@
+package com.refund.service.service;
+@Service
+public class RefundServiceImpl implements RefundService {
+
+    @Autowired
+    private RefundRepo refundRepo;
+
+    @Autowired
+    private PaymentClient paymentClient;
+
+    @Autowired
+    private BookingClient bookingClient;
+
+    @Override
+    public RefundResponseDto requestRefund(RefundRequestDto request) {
+
+        Refund existing = refundRepo.findByBookingId(request.getBookingId());
+
+        if(existing != null) {
+            throw new RuntimeException("Refund Already Requested");
+        }
+
+        BookingDto booking = bookingClient.getById(request.getBookingId());
+
+        if(booking == null) {
+            throw new RuntimeException("Booking Not Found");
+        }
+
+        if(!booking.getBookingStatus().equals("BOOKED")) {
+            throw new RuntimeException("Only Confirmed Booking Can Be Refunded");
+        }
+
+        PaymentDto payment = paymentClient.getByBooking(request.getBookingId());
+
+        if(payment == null) {
+            throw new RuntimeException("Payment Not Found");
+        }
+
+        if(!payment.getPaymentStatus().equals("SUCCESS")) {
+            throw new RuntimeException("Payment Not Successful");
+        }
+
+        Refund refund = new Refund();
+
+        refund.setBookingId(booking.getBookingId());
+        refund.setPaymentId(payment.getPaymentId());
+        refund.setUserId(booking.getUserId());
+        refund.setRefundAmount(payment.getAmount());
+        refund.setRefundReason(request.getRefundReason());
+        refund.setRefundStatus("REFUNDED");
+        refund.setRequestedAt(LocalDateTime.now());
+        refund.setRefundedAt(LocalDateTime.now());
+
+        Refund saved = refundRepo.save(refund);
+
+        bookingClient.cancelBooking(booking.getBookingId());
+
+        return map(saved);
+    }
+
+    @Override
+    public List<RefundResponseDto> viewAll() {
+
+        return refundRepo.findAll()
+                .stream()
+                .map(this::map)
+                .toList();
+    }
+
+    @Override
+    public RefundResponseDto getById(Integer id) {
+
+        Refund refund = refundRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Refund Not Found"));
+
+        return map(refund);
+    }
+
+    @Override
+    public List<RefundResponseDto> getByUser(Integer userId) {
+
+        return refundRepo.findByUserId(userId)
+                .stream()
+                .map(this::map)
+                .toList();
+    }
+
+    @Override
+    public List<RefundResponseDto> getByStatus(String status) {
+
+        return refundRepo.findByRefundStatus(status)
+                .stream()
+                .map(this::map)
+                .toList();
+    }
+
+    private RefundResponseDto map(Refund refund) {
+
+        RefundResponseDto response = new RefundResponseDto();
+
+        response.setRefundId(refund.getRefundId());
+        response.setBookingId(refund.getBookingId());
+        response.setPaymentId(refund.getPaymentId());
+        response.setUserId(refund.getUserId());
+        response.setRefundAmount(refund.getRefundAmount());
+        response.setRefundReason(refund.getRefundReason());
+        response.setRefundStatus(refund.getRefundStatus());
+        response.setRequestedAt(refund.getRequestedAt());
+        response.setRefundedAt(refund.getRefundedAt());
+
+        return response;
+    }
+}

@@ -1,0 +1,5 @@
+package com.reportanalytics.service.dto;
+@Data
+public class UserDto {
+    private Integer userId;
+}

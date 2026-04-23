@@ -1,0 +1,7 @@
+package com.qrticket.service.dto;
+@Data
+public class EventDto {
+
+    private Integer eventId;
+    private String eventName;
+}

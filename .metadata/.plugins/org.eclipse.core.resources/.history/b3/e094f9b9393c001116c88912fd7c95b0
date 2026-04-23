@@ -1,0 +1,9 @@
+package com.payment.service.client;
+@Data
+public class NotificationDto {
+
+    private Integer userId;
+    private String notificationType;
+    private String message;
+    private String attachmentPath;
+}

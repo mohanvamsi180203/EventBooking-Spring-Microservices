@@ -1,0 +1,16 @@
+package com.reportanalytics.service.dto;
+
+import lombok.Data;
+
+@Data
+public class SummaryResponseDto {
+
+    private Integer totalUsers;
+    private Integer totalEvents;
+    private Integer totalBookings;
+    private Double totalRevenue;
+    private Double totalRefunds;
+    private Integer cancelledBookings;
+    private Integer privateEvents;
+    private Integer publicEvents;
+}

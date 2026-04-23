@@ -1,0 +1,12 @@
+package com.reportanalytics.service.dto;
+
+import lombok.Data;
+
+@Data
+public class BookingDto {
+
+    private Integer bookingId;
+    private Double totalAmount;
+    private String bookingStatus;
+    private Integer eventId;
+}

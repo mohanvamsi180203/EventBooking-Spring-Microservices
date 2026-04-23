@@ -1,0 +1,18 @@
+package com.refund.service.client;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+
+import com.refund.service.dto.BookingDto;
+
+@FeignClient(name = "BOOKING-SERVICE")
+public interface BookingClient {
+
+    @GetMapping("/api/booking/getEntity/{id}")
+    BookingDto getById(@PathVariable("id") Integer id);
+
+    @PutMapping("/api/booking/cancel/{id}")
+    BookingDto cancelBooking(@PathVariable("id") Integer id);
+}

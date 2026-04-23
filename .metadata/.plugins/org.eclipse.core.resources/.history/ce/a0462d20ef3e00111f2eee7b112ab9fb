@@ -1,0 +1,290 @@
+//package com.user.service.service;
+//
+//import java.util.List;
+//import java.util.stream.Collectors;
+//
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.stereotype.Service;
+//
+//import com.user.service.client.AuthClient;
+//import com.user.service.dto.AuthDto;
+//import com.user.service.dto.UserResponseDto;
+//import com.user.service.entity.User;
+//import com.user.service.repo.UserRepo;
+//
+//@Service
+//public class UserServiceImpl implements UserService {
+//
+//    @Autowired
+//    private UserRepo userRepo;
+//
+//   
+//
+//    @Override
+//    public User addUser(User user) {
+//
+//        AuthDto auth = authClient.getById(user.getAuthId());
+//
+//        if(auth == null) {
+//            throw new RuntimeException("Auth Record Not Found");
+//        }
+//
+//        if(userRepo.existsByEmail(user.getEmail())) {
+//            throw new RuntimeException("Email Already Exists");
+//        }
+//
+//        if(user.getPhone().length() != 10) {
+//            throw new RuntimeException("Phone Number Must Be 10 Digits");
+//        }
+//
+//        return userRepo.save(user);
+//    }
+//
+//    @Override
+//    public User updateUser(Integer id, User user) {
+//
+//        User existingUser = userRepo.findById(id).orElse(null);
+//
+//        if(existingUser != null) {
+//            existingUser.setName(user.getName());
+//            existingUser.setEmail(user.getEmail());
+//            existingUser.setPhone(user.getPhone());
+//            existingUser.setCity(user.getCity());
+//            existingUser.setStatus(user.getStatus());
+//
+//            return userRepo.save(existingUser);
+//        }
+//
+//        return null;
+//    }
+//
+//    @Override
+//    public String deleteUser(Integer id) {
+//
+//        	userRepo.deleteById(id);
+//
+//        return "User Deleted Successfully";
+//    }
+//
+////    @Override
+////    public List<User> viewAll() {
+////        return userRepo.findAll();
+////    }
+//    
+//    @Override
+//    public List<UserResponseDto> viewAll() {
+//
+//        List<User> users = userRepo.findAll();
+//
+//        return users.stream().map(user -> {
+//
+//            AuthDto auth = authClient.getById(user.getAuthId());
+//
+//            UserResponseDto response = new UserResponseDto();
+//
+//            response.setUserId(user.getUserId());
+//            response.setAuthId(user.getAuthId());
+//            response.setName(user.getName());
+//            response.setEmail(user.getEmail());
+//            response.setPhone(user.getPhone());
+//            response.setCity(user.getCity());
+//            response.setStatus(user.getStatus());
+//            response.setAuth(auth);
+//
+//            return response;
+//
+//        }).collect(Collectors.toList());
+//    }
+//
+////    @Override
+////    public User getById(Integer id) {
+////        return userRepo.findById(id).orElse(null);
+////    }
+//    
+//    
+//    @Override
+//    public UserResponseDto getById(Integer id) {
+//
+//        User user = userRepo.findById(id).orElse(null);
+//
+//        AuthDto auth = authClient.getById(user.getAuthId());
+//
+//        UserResponseDto response = new UserResponseDto();
+//
+//        response.setUserId(user.getUserId());
+//        response.setAuthId(user.getAuthId());
+//        response.setName(user.getName());
+//        response.setEmail(user.getEmail());
+//        response.setPhone(user.getPhone());
+//        response.setCity(user.getCity());
+//        response.setStatus(user.getStatus());
+//        response.setAuth(auth);
+//
+//        return response;
+//    }
+//
+////    @Override
+////    public User getByEmail(String email) {
+////        return userRepo.findByEmail(email);
+////    }
+//
+//    
+//    @Override
+//    public UserResponseDto getByEmail(String email) {
+//
+//        User user = userRepo.findByEmail(email);
+//
+//        AuthDto auth = authClient.getById(user.getAuthId());
+//
+//        UserResponseDto response = new UserResponseDto();
+//
+//        response.setUserId(user.getUserId());
+//        response.setAuthId(user.getAuthId());
+//        response.setName(user.getName());
+//        response.setEmail(user.getEmail());
+//        response.setPhone(user.getPhone());
+//        response.setCity(user.getCity());
+//        response.setStatus(user.getStatus());
+//        response.setAuth(auth);
+//
+//        return response;
+//    }
+////    @Override
+////    public List<User> getByName(String name) {
+////        return userRepo.findByNameContaining(name);
+////    }
+//
+//    @Override
+//    public List<UserResponseDto> getByName(String name) {
+//
+//        List<User> users = userRepo.findByNameContaining(name);
+//
+//        return users.stream().map(user -> {
+//
+//            AuthDto auth = authClient.getById(user.getAuthId());
+//
+//            UserResponseDto response = new UserResponseDto();
+//
+//            response.setUserId(user.getUserId());
+//            response.setAuthId(user.getAuthId());
+//            response.setName(user.getName());
+//            response.setEmail(user.getEmail());
+//            response.setPhone(user.getPhone());
+//            response.setCity(user.getCity());
+//            response.setStatus(user.getStatus());
+//            response.setAuth(auth);
+//
+//            return response;
+//
+//        }).collect(Collectors.toList());
+//    }
+////    @Override
+////    public List<User> getByCity(String city) {
+////        return userRepo.findByCity(city);
+////    }
+//    
+//    @Override
+//    public List<UserResponseDto> getByCity(String city) {
+//
+//        List<User> users = userRepo.findByCity(city);
+//
+//        return users.stream().map(user -> {
+//
+//            AuthDto auth = authClient.getById(user.getAuthId());
+//
+//            UserResponseDto response = new UserResponseDto();
+//
+//            response.setUserId(user.getUserId());
+//            response.setAuthId(user.getAuthId());
+//            response.setName(user.getName());
+//            response.setEmail(user.getEmail());
+//            response.setPhone(user.getPhone());
+//            response.setCity(user.getCity());
+//            response.setStatus(user.getStatus());
+//            response.setAuth(auth);
+//
+//            return response;
+//
+//        }).collect(Collectors.toList());
+//    }
+//    
+//    
+//    @Override
+//    public User getUserEntityById(Integer id) {
+//        return userRepo.findById(id).orElse(null);
+//    }
+//}
+
+
+
+package com.user.service.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.user.service.dto.UserResponseDto;
+import com.user.service.entity.User;
+import com.user.service.service.UserService;
+
+@RestController
+@RequestMapping("/api/user")
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+
+    @PostMapping("/save")
+    public User addUser(@RequestBody User user) {
+        return userService.addUser(user);
+    }
+   
+
+    @PutMapping("/update/{id}")
+    public User updateUser(@PathVariable Integer id, @RequestBody User user) {
+        return userService.updateUser(id, user);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public String deleteUser(@PathVariable Integer id) {
+        return userService.deleteUser(id);
+    }
+
+    @GetMapping("/view")
+    public List<UserResponseDto> viewAll() {
+        return userService.viewAll();
+    }
+
+    @GetMapping("/get/{id}")
+    public UserResponseDto getById(@PathVariable Integer id) {
+        return userService.getById(id);
+    }
+
+    @GetMapping("/getByEmail/{email}")
+    public UserResponseDto getByEmail(@PathVariable String email) {
+        return userService.getByEmail(email);
+    }
+
+    @GetMapping("/getByName/{name}")
+    public List<UserResponseDto> getByName(@PathVariable String name) {
+        return userService.getByName(name);
+    }
+
+    @GetMapping("/getByCity/{city}")
+    public List<UserResponseDto> getByCity(@PathVariable String city) {
+        return userService.getByCity(city);
+    }
+    
+    @GetMapping("/getEntity/{id}")
+    public User getUserEntityById(@PathVariable Integer id) {
+        return userService.getUserEntityById(id);
+    }
+}

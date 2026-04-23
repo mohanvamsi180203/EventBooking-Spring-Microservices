@@ -1,0 +1,14 @@
+package com.notification.service.entity;
+@Entity
+public class Notification {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer notificationId;
+
+    private Integer userId;
+    private String message;
+    private String notificationType;
+    private LocalDateTime createdAt;
+    private String status;
+}

@@ -1,0 +1,12 @@
+package com.recommendation.servicedto;
+public class BookingDto {
+
+    private Integer bookingId;
+    private Integer quantity;
+    private Double totalAmount;
+    private LocalDate bookingDate;
+    private String bookingStatus;
+
+    private UserDto user;
+    private EventDto event;
+}

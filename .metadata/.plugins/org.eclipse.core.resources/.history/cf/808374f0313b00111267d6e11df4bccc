@@ -1,0 +1,21 @@
+package com.auth.service.entity;
+
+import jakarta.persistence.Entity;
+
+
+
+
+@Entity
+public class Auth {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)public Auth() {
+		// TODO Auto-generated constructor stub
+	}
+    private Integer authId;
+
+    private String username;
+    private String email;
+    private String password;
+    private String role;
+}

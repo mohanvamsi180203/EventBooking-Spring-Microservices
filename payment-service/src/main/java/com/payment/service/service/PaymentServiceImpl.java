@@ -1,0 +1,148 @@
+package com.payment.service.service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.payment.service.client.BookingClient;
+import com.payment.service.client.NotificationClient;
+import com.payment.service.client.SeatClient;
+import com.payment.service.client.TicketClient;
+import com.payment.service.dto.BookingDto;
+import com.payment.service.dto.NotificationDto;
+import com.payment.service.dto.PaymentVerifyRequest;
+import com.payment.service.dto.TicketResponseDto;
+import com.payment.service.entity.Payment;
+import com.payment.service.repo.PaymentRepo;
+import com.razorpay.Order;
+import com.razorpay.RazorpayClient;
+
+
+
+@Service
+public class PaymentServiceImpl implements PaymentService {
+
+    @org.springframework.beans.factory.annotation.Value("${razorpay.key.id}")
+    private String keyId;
+
+    @org.springframework.beans.factory.annotation.Value("${razorpay.key.secret}")
+    private String keySecret;
+
+    @Autowired
+    private PaymentRepo paymentRepo;
+
+    @Autowired
+    private BookingClient bookingClient;
+    
+    @Autowired
+    private TicketClient ticketClient;
+    
+    @Autowired
+    private NotificationClient notificationClient;
+
+    @Autowired
+    private SeatClient seatClient;
+    @Override
+    public String createOrder(Integer bookingId) throws Exception {
+
+        BookingDto booking = bookingClient.getById(bookingId);
+
+        if(booking == null) {
+            throw new RuntimeException("Booking Not Found");
+        }
+
+        if(booking.getBookingStatus().equals("BOOKED")) {
+            throw new RuntimeException("Booking Already Confirmed");
+        }
+
+        RazorpayClient razorpay = new RazorpayClient(keyId, keySecret);
+
+        JSONObject orderRequest = new JSONObject();
+
+        orderRequest.put("amount", booking.getTotalAmount() * 100);
+        orderRequest.put("currency", "INR");
+        orderRequest.put("receipt", "booking_" + bookingId);
+
+        Order order = razorpay.orders.create(orderRequest);
+
+        Payment payment = new Payment();
+
+        payment.setBookingId(bookingId);
+        payment.setRazorpayOrderId(order.get("id"));
+        payment.setAmount(booking.getTotalAmount());
+        payment.setPaymentStatus("CREATED");
+
+        paymentRepo.save(payment);
+
+        return order.toString();
+    }
+
+    @Override
+    public String verifyPayment(PaymentVerifyRequest request) {
+
+        Payment payment = paymentRepo.findByRazorpayOrderId(
+                request.getRazorpayOrderId());
+
+        if(payment == null) {
+            throw new RuntimeException("Payment Not Found");
+        }
+
+        if(payment.getPaymentStatus().equalsIgnoreCase("SUCCESS")) {
+            throw new RuntimeException("Payment Already Verified");
+        }
+
+        payment.setRazorpayPaymentId(request.getRazorpayPaymentId());
+        payment.setPaymentStatus("SUCCESS");
+        payment.setPaymentDate(LocalDateTime.now());
+
+        paymentRepo.save(payment);
+
+        bookingClient.confirmBooking(payment.getBookingId());
+
+        BookingDto booking = bookingClient.getById(payment.getBookingId());
+
+        if(booking.getSeatIds() != null && !booking.getSeatIds().isEmpty()) {
+            seatClient.confirmSeats(booking.getSeatIds());
+        }
+
+        TicketResponseDto ticket =
+                ticketClient.generateTicket(payment.getBookingId());
+
+        NotificationDto notification = new NotificationDto();
+
+        notification.setUserId(ticket.getUserId());
+        notification.setNotificationType("BOOKING_CONFIRMED");
+
+        notification.setMessage(
+                "Your booking has been confirmed successfully.\n\n" +
+                "Booking ID: " + ticket.getBookingId() +
+                "\nEvent Name: " + ticket.getEventName() +
+                "\nCategory: " + ticket.getCategory() +
+                "\nCity: " + ticket.getCity() +
+                "\nEvent Date: " + ticket.getEventDate() +
+                "\nTicket Status: " + ticket.getTicketStatus() +
+                "\n\nPlease find your QR ticket attached with this email." +
+                "\nShow this QR code at the event entry gate." +
+                "\n\nEnjoy your event!"
+        );
+
+        notification.setAttachmentPath(ticket.getQrImagePath());
+
+        notificationClient.sendNotification(notification);
+
+        return "Payment Successful, Booking Confirmed And Ticket Details Sent To Email";
+    }
+
+    @Override
+    public List<Payment> viewAll() {
+        return paymentRepo.findAll();
+    }
+
+    @Override
+    public Payment getById(Integer id) {
+        return paymentRepo.findById(id).orElse(null);
+    }
+}

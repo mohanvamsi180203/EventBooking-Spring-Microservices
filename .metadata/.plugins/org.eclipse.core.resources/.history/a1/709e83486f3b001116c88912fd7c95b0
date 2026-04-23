@@ -1,0 +1,15 @@
+@Entity
+public class Booking {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer bookingId;
+
+    private Integer userId;
+    private Integer eventId;
+    private Integer quantity;
+    private Double totalAmount;
+    private LocalDate bookingDate;
+    private String bookingStatus;
+    private LocalDateTime lockedUntil;
+}

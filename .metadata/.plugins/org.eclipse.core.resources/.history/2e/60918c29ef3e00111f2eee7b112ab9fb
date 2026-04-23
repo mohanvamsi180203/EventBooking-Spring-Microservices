@@ -1,0 +1,71 @@
+package com.user.service.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.user.service.dto.UserResponseDto;
+import com.user.service.entity.User;
+import com.user.service.service.UserService;
+
+@RestController
+@RequestMapping("/api/user")
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+
+    @PostMapping("/save")
+    public User addUser(@RequestBody User user) {
+        return userService.addUser(user);
+    }
+   
+
+    @PutMapping("/update/{id}")
+    public User updateUser(@PathVariable Integer id, @RequestBody User user) {
+        return userService.updateUser(id, user);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public String deleteUser(@PathVariable Integer id) {
+        return userService.deleteUser(id);
+    }
+
+    @GetMapping("/view")
+    public List<UserResponseDto> viewAll() {
+        return userService.viewAll();
+    }
+
+    @GetMapping("/get/{id}")
+    public UserResponseDto getById(@PathVariable Integer id) {
+        return userService.getById(id);
+    }
+
+    @GetMapping("/getByEmail/{email}")
+    public UserResponseDto getByEmail(@PathVariable String email) {
+        return userService.getByEmail(email);
+    }
+
+    @GetMapping("/getByName/{name}")
+    public List<UserResponseDto> getByName(@PathVariable String name) {
+        return userService.getByName(name);
+    }
+
+    @GetMapping("/getByCity/{city}")
+    public List<UserResponseDto> getByCity(@PathVariable String city) {
+        return userService.getByCity(city);
+    }
+    
+    @GetMapping("/getEntity/{id}")
+    public User getUserEntityById(@PathVariable Integer id) {
+        return userService.getUserEntityById(id);
+    }
+}

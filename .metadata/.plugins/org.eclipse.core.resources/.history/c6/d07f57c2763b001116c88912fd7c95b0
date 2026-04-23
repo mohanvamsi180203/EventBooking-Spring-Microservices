@@ -1,0 +1,11 @@
+@Entity
+public class PrivateAccess {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer accessId;
+
+    private Integer eventId;
+    private Integer userId;
+    private String invitationStatus;
+}

@@ -1,0 +1,11 @@
+package com.payment.service.repo;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.payment.service.entity.Payment;
+
+public interface PaymentRepo extends JpaRepository<Payment, Integer> {
+
+    Payment findByRazorpayOrderId(String razorpayOrderId);
+    Payment findByBookingId(Integer bookingId);
+}

@@ -1,0 +1,6 @@
+package com.payment.service.dto;
+public class PaymentVerifyRequest {
+
+    private String razorpayOrderId;
+    private String razorpayPaymentId;
+}

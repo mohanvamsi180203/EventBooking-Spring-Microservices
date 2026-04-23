@@ -1,0 +1,8 @@
+package com.refund.service.dto;
+public class PaymentDto {
+
+    private Integer paymentId;
+    private Integer bookingId;
+    private Double amount;
+    private String paymentStatus;
+}

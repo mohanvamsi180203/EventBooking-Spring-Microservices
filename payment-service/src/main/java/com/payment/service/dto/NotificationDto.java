@@ -1,0 +1,12 @@
+package com.payment.service.dto;
+
+import lombok.Data;
+
+@Data
+public class NotificationDto {
+
+    private Integer userId;
+    private String notificationType;
+    private String message;
+    private String attachmentPath;
+}

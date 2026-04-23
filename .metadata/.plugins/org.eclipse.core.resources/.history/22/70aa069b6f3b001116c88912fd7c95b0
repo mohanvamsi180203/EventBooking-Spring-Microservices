@@ -1,0 +1,17 @@
+package com.booking.service.client;
+@FeignClient(name = "EVENT-SERVICE")
+public interface EventClient {
+
+    @GetMapping("/api/event/getEntity/{id}")
+    EventDto getEventEntityById(@PathVariable Integer id);
+
+    @PutMapping("/api/event/reduceAvailableTickets/{id}/{tickets}")
+    EventDto reduceAvailableTickets(
+            @PathVariable Integer id,
+            @PathVariable Integer tickets);
+
+    @PutMapping("/api/event/increaseAvailableTickets/{id}/{tickets}")
+    EventDto increaseAvailableTickets(
+            @PathVariable Integer id,
+            @PathVariable Integer tickets);
+}

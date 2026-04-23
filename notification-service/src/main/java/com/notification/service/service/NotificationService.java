@@ -1,0 +1,21 @@
+package com.notification.service.service;
+
+import java.util.List;
+
+import com.notification.service.dto.NotificationResponseDto;
+import com.notification.service.entity.Notification;
+
+public interface NotificationService {
+
+    NotificationResponseDto sendNotification(Notification notification);
+
+    List<NotificationResponseDto> viewAll();
+
+    NotificationResponseDto getById(Integer id);
+
+    List<NotificationResponseDto> getByUser(Integer userId);
+
+    List<NotificationResponseDto> getByStatus(String status);
+
+    NotificationResponseDto markAsRead(Integer id);
+}

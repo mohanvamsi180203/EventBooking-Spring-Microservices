@@ -1,0 +1,16 @@
+package com.qrticket.service.entity;
+@Entity
+public class Ticket {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer ticketId;
+
+    private Integer bookingId;
+    private Integer userId;
+    private Integer eventId;
+    private String qrCodeText;
+    private String qrImagePath;
+    private String ticketStatus;
+    private LocalDateTime generatedAt;
+}

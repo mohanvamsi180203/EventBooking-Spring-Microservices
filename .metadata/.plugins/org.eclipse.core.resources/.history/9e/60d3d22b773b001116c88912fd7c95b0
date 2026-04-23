@@ -1,0 +1,50 @@
+@RestController
+@RequestMapping("/api/private-access")
+public class PrivateAccessController {
+
+    @Autowired
+    private PrivateAccessService privateAccessService;
+
+    @PostMapping("/invite")
+    public PrivateAccessResponseDto inviteUser(@RequestBody PrivateAccess access) {
+        return privateAccessService.inviteUser(access);
+    }
+
+    @PutMapping("/accept/{accessId}")
+    public PrivateAccessResponseDto acceptInvitation(@PathVariable Integer accessId) {
+        return privateAccessService.acceptInvitation(accessId);
+    }
+
+    @PutMapping("/reject/{accessId}")
+    public PrivateAccessResponseDto rejectInvitation(@PathVariable Integer accessId) {
+        return privateAccessService.rejectInvitation(accessId);
+    }
+
+    @GetMapping("/view")
+    public List<PrivateAccessResponseDto> viewAll() {
+        return privateAccessService.viewAll();
+    }
+
+    @GetMapping("/get/{id}")
+    public PrivateAccessResponseDto getById(@PathVariable Integer id) {
+        return privateAccessService.getById(id);
+    }
+
+    @GetMapping("/getByUser/{userId}")
+    public List<PrivateAccessResponseDto> getByUser(@PathVariable Integer userId) {
+        return privateAccessService.getByUser(userId);
+    }
+
+    @GetMapping("/getByEvent/{eventId}")
+    public List<PrivateAccessResponseDto> getByEvent(@PathVariable Integer eventId) {
+        return privateAccessService.getByEvent(eventId);
+    }
+
+    @GetMapping("/getByEventAndUser/{eventId}/{userId}")
+    public PrivateAccess getByEventAndUser(
+            @PathVariable Integer eventId,
+            @PathVariable Integer userId) {
+
+        return privateAccessService.getByEventAndUser(eventId, userId);
+    }
+}

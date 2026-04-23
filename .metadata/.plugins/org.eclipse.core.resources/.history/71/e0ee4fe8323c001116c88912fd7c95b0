@@ -1,0 +1,12 @@
+public interface ReportService {
+
+    SummaryResponseDto getSummary();
+
+    List<CategoryReportDto> getCategoryWise();
+
+    List<CityReportDto> getCityWise();
+
+    Double getTotalRevenue();
+
+    Double getTotalRefunds();
+}

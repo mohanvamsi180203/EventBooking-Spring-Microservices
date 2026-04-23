@@ -1,0 +1,9 @@
+package com.example.demo.dto;
+public class PrivateAccessResponseDto {
+
+    private Integer accessId;
+    private String invitationStatus;
+
+    private UserDto user;
+    private EventDto event;
+}

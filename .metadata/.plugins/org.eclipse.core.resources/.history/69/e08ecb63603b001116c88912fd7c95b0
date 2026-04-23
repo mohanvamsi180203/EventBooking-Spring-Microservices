@@ -1,0 +1,43 @@
+package com.venue.service.controller;
+@RestController
+@RequestMapping("/api/venue")
+public class VenueController {
+
+    @Autowired
+    private VenueService venueService;
+
+    @PostMapping("/save")
+    public Venue addVenue(@RequestBody Venue venue) {
+        return venueService.addVenue(venue);
+    }
+
+    @PutMapping("/update/{id}")
+    public Venue updateVenue(@PathVariable Integer id, @RequestBody Venue venue) {
+        return venueService.updateVenue(id, venue);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public String deleteVenue(@PathVariable Integer id) {
+        return venueService.deleteVenue(id);
+    }
+
+    @GetMapping("/view")
+    public List<Venue> viewAll() {
+        return venueService.viewAll();
+    }
+
+    @GetMapping("/get/{id}")
+    public Venue getById(@PathVariable Integer id) {
+        return venueService.getById(id);
+    }
+
+    @GetMapping("/getByName/{name}")
+    public List<Venue> getByName(@PathVariable String name) {
+        return venueService.getByName(name);
+    }
+
+    @GetMapping("/getByLocation/{location}")
+    public List<Venue> getByLocation(@PathVariable String location) {
+        return venueService.getByLocation(location);
+    }
+}

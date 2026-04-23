@@ -1,0 +1,22 @@
+package com.booking.service.dto;
+
+
+
+import lombok.Data;
+
+@Data
+public class BookingResponseDto {
+
+	private Integer bookingId;
+	private Integer userId;
+	private Integer eventId;
+	private Integer quantity;
+	private Double totalAmount;
+	private String bookingStatus;
+
+	private String eventName;
+	private String category;
+	private String city;
+	private String eventDate;
+	private String venueName;
+}

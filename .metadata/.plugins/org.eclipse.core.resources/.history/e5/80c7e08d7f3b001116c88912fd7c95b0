@@ -1,0 +1,7 @@
+package com.recommendation.service.client;
+@FeignClient(name = "BOOKING-SERVICE")
+public interface BookingClient {
+
+    @GetMapping("/api/booking/getByUser/{userId}")
+    List<BookingDto> getByUser(@PathVariable Integer userId);
+}

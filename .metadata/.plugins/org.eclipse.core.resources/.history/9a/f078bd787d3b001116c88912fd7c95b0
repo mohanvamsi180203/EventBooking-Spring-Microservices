@@ -1,0 +1,11 @@
+public class OrganizerDashboardResponseDto {
+
+    private Integer organizerId;
+    private String organizerName;
+    private Integer totalEvents;
+    private Integer totalBookings;
+    private Integer totalTicketsSold;
+    private Double totalRevenue;
+    private Integer upcomingEvents;
+    private Integer cancelledEvents;
+}

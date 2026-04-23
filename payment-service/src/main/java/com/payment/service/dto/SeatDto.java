@@ -1,0 +1,11 @@
+package com.payment.service.dto;
+
+import lombok.Data;
+
+@Data
+public class SeatDto {
+
+    private Integer seatId;
+    private String seatLabel;
+    private String status;
+}

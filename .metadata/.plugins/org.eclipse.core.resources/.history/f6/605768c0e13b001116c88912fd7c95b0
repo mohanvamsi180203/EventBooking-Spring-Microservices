@@ -1,0 +1,10 @@
+package com.payment.service.client;
+@FeignClient(name = "BOOKING-SERVICE")
+public interface BookingClient {
+
+    @GetMapping("/api/booking/get/{id}")
+    BookingDto getById(@PathVariable("id") Integer id);
+
+    @PutMapping("/api/booking/confirm/{bookingId}")
+    BookingDto confirmBooking(@PathVariable("bookingId") Integer bookingId);
+}

@@ -1,0 +1,7 @@
+@Data
+@AllArgsConstructor
+public class CityReportDto {
+
+    private String city;
+    private Long count;
+}

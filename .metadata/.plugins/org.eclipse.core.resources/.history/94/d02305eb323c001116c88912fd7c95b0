@@ -1,0 +1,13 @@
+package com.reportanalytics.service.service;
+public interface ReportService {
+
+    SummaryResponseDto getSummary();
+
+    List<CategoryReportDto> getCategoryWise();
+
+    List<CityReportDto> getCityWise();
+
+    Double getTotalRevenue();
+
+    Double getTotalRefunds();
+}

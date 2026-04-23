@@ -1,0 +1,9 @@
+package com.refund.service.repo;
+public interface RefundRepo extends JpaRepository<Refund, Integer> {
+
+    List<Refund> findByUserId(Integer userId);
+
+    List<Refund> findByRefundStatus(String refundStatus);
+
+    Refund findByBookingId(Integer bookingId);
+}

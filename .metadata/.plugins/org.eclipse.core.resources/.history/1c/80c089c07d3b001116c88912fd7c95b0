@@ -1,0 +1,4 @@
+public interface OrganizerDashboardService {
+
+    OrganizerDashboardResponseDto getDashboard(Integer organizerId);
+}

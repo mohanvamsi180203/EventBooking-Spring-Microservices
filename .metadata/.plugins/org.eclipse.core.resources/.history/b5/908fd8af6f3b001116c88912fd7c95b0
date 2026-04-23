@@ -1,0 +1,21 @@
+package com.booking.service.service;
+public interface BookingService {
+
+    Booking blockTickets(Booking booking);
+
+    Booking confirmBooking(Integer bookingId);
+
+    String cancelBooking(Integer bookingId);
+
+    String expireBooking(Integer bookingId);
+
+    List<BookingResponseDto> viewAll();
+
+    BookingResponseDto getById(Integer id);
+
+    List<BookingResponseDto> getByUser(Integer userId);
+
+    List<BookingResponseDto> getByEvent(Integer eventId);
+
+    List<BookingResponseDto> getByStatus(String status);
+}

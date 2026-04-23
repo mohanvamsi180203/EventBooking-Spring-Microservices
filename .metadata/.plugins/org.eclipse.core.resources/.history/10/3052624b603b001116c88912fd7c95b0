@@ -1,0 +1,17 @@
+package com.venue.service.service;
+public interface VenueService {
+
+    Venue addVenue(Venue venue);
+
+    Venue updateVenue(Integer id, Venue venue);
+
+    String deleteVenue(Integer id);
+
+    List<Venue> viewAll();
+
+    Venue getById(Integer id);
+
+    List<Venue> getByName(String name);
+
+    List<Venue> getByLocation(String location);
+}

@@ -1,0 +1,37 @@
+@RestController
+@RequestMapping("/api/wishlist")
+public class WishlistController {
+
+    @Autowired
+    private WishlistService wishlistService;
+
+    @PostMapping("/add")
+    public WishlistResponseDto addToWishlist(@RequestBody Wishlist wishlist) {
+        return wishlistService.addToWishlist(wishlist);
+    }
+
+    @DeleteMapping("/remove/{wishlistId}")
+    public String removeFromWishlist(@PathVariable Integer wishlistId) {
+        return wishlistService.removeFromWishlist(wishlistId);
+    }
+
+    @GetMapping("/view")
+    public List<WishlistResponseDto> viewAll() {
+        return wishlistService.viewAll();
+    }
+
+    @GetMapping("/get/{id}")
+    public WishlistResponseDto getById(@PathVariable Integer id) {
+        return wishlistService.getById(id);
+    }
+
+    @GetMapping("/getByUser/{userId}")
+    public List<WishlistResponseDto> getByUser(@PathVariable Integer userId) {
+        return wishlistService.getByUser(userId);
+    }
+
+    @GetMapping("/getByEvent/{eventId}")
+    public List<WishlistResponseDto> getByEvent(@PathVariable Integer eventId) {
+        return wishlistService.getByEvent(eventId);
+    }
+}

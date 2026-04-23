@@ -1,0 +1,135 @@
+@Service
+public class TicketServiceImpl implements TicketService {
+
+    @Autowired
+    private TicketRepo ticketRepo;
+
+    @Autowired
+    private BookingClient bookingClient;
+
+    @Override
+    public TicketResponseDto generateTicket(Integer bookingId) {
+
+        Ticket existing = ticketRepo.findByBookingId(bookingId);
+
+        if(existing != null) {
+            return map(existing);
+        }
+
+        BookingDto booking = bookingClient.getById(bookingId);
+
+        if(booking == null) {
+            throw new RuntimeException("Booking Not Found");
+        }
+
+        if(!booking.getBookingStatus().equalsIgnoreCase("BOOKED")) {
+            throw new RuntimeException("Only Confirmed Booking Can Generate Ticket");
+        }
+
+        String qrText = "BOOKING-" + booking.getBookingId()
+                + "-USER-" + booking.getUserId()
+                + "-EVENT-" + booking.getEventId();
+
+        String folderPath = "tickets";
+
+        File folder = new File(folderPath);
+
+        if(!folder.exists()) {
+            folder.mkdirs();
+        }
+
+        String filePath = folderPath + "/booking_" + bookingId + ".png";
+
+        try {
+
+            BitMatrix matrix = new MultiFormatWriter().encode(
+                    qrText,
+                    BarcodeFormat.QR_CODE,
+                    300,
+                    300
+            );
+
+            Path path = FileSystems.getDefault().getPath(filePath);
+
+            MatrixToImageWriter.writeToPath(matrix, "PNG", path);
+
+        } catch(Exception e) {
+            throw new RuntimeException("QR Generation Failed");
+        }
+
+        Ticket ticket = new Ticket();
+
+        ticket.setBookingId(booking.getBookingId());
+        ticket.setUserId(booking.getUserId());
+        ticket.setEventId(booking.getEventId());
+        ticket.setQrCodeText(qrText);
+        ticket.setQrImagePath(filePath);
+        ticket.setTicketStatus("ACTIVE");
+        ticket.setGeneratedAt(LocalDateTime.now());
+
+        Ticket saved = ticketRepo.save(ticket);
+
+        return map(saved);
+    }
+
+    @Override
+    public TicketResponseDto getByBooking(Integer bookingId) {
+
+        Ticket ticket = ticketRepo.findByBookingId(bookingId);
+
+        if(ticket == null) {
+            throw new RuntimeException("Ticket Not Found");
+        }
+
+        return map(ticket);
+    }
+
+    @Override
+    public TicketResponseDto verifyTicket(String qrCodeText) {
+
+        Ticket ticket = ticketRepo.findByQrCodeText(qrCodeText);
+
+        if(ticket == null) {
+            throw new RuntimeException("Invalid QR Ticket");
+        }
+
+        if(ticket.getTicketStatus().equalsIgnoreCase("USED")) {
+            throw new RuntimeException("Ticket Already Used");
+        }
+
+        if(ticket.getTicketStatus().equalsIgnoreCase("CANCELLED")) {
+            throw new RuntimeException("Ticket Cancelled");
+        }
+
+        ticket.setTicketStatus("USED");
+
+        Ticket saved = ticketRepo.save(ticket);
+
+        return map(saved);
+    }
+
+    @Override
+    public List<TicketResponseDto> viewAll() {
+
+        return ticketRepo.findAll()
+                .stream()
+                .map(this::map)
+                .toList();
+    }
+
+    private TicketResponseDto map(Ticket ticket) {
+
+        TicketResponseDto response = new TicketResponseDto();
+
+        response.setTicketId(ticket.getTicketId());
+        response.setBookingId(ticket.getBookingId());
+        response.setUserId(ticket.getUserId());
+        response.setEventId(ticket.getEventId());
+        response.setQrCodeText(ticket.getQrCodeText());
+        response.setQrImagePath(ticket.getQrImagePath());
+        response.setTicketStatus(ticket.getTicketStatus());
+        response.setGeneratedAt(ticket.getGeneratedAt());
+
+        return response;
+    }
+}

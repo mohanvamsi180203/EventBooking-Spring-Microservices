@@ -1,0 +1,7 @@
+package com.auth.service.dto;
+@Data
+public class RegisterRequest {
+    private String username;
+    private String email;
+    private String password;
+}

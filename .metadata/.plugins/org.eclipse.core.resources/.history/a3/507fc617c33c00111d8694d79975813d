@@ -1,0 +1,8 @@
+package com.booking.service.dto;
+@Data
+public class SeatDto {
+
+    private Integer seatId;
+    private String seatLabel;
+    private String status;
+}

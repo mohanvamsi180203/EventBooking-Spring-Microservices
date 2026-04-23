@@ -1,0 +1,8 @@
+public interface PrivateAccessRepo extends JpaRepository<PrivateAccess, Integer> {
+
+    List<PrivateAccess> findByUserId(Integer userId);
+
+    List<PrivateAccess> findByEventId(Integer eventId);
+
+    PrivateAccess findByEventIdAndUserId(Integer eventId, Integer userId);
+}

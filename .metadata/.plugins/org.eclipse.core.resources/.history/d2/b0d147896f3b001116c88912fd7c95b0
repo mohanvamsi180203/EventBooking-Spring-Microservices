@@ -1,0 +1,13 @@
+public class BookingResponseDto {
+
+    private Integer bookingId;
+    private Integer quantity;
+    private Double totalAmount;
+    private LocalDate bookingDate;
+    private String bookingStatus;
+    private LocalDateTime lockedUntil;
+
+    private UserDto user;
+    private EventDto event;
+    private VenueDto venue;
+}

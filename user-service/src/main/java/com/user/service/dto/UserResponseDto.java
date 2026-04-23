@@ -1,0 +1,25 @@
+package com.user.service.dto;
+
+import lombok.Data;
+
+@Data
+public class UserResponseDto {
+
+//	private Integer userId;
+//	private String name;
+//	private String email;
+//	private String phone;
+//	private String city;
+//	private String status;
+//	private Integer authId;
+//	private AuthDto auth;
+	
+	
+
+	private Integer userId;
+    private String name;
+    private String email;
+    private String phone;
+    private String city;
+    private String status;
+	}

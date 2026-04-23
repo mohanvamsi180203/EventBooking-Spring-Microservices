@@ -1,0 +1,7 @@
+@Data
+@AllArgsConstructor
+public class CategoryReportDto {
+
+    private String category;
+    private Long count;
+}

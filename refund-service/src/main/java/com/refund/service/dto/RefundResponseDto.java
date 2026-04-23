@@ -1,0 +1,19 @@
+package com.refund.service.dto;
+
+import java.time.LocalDateTime;
+
+import lombok.Data;
+@Data
+
+public class RefundResponseDto {
+
+    private Integer refundId;
+    private Integer bookingId;
+    private Integer paymentId;
+    private Integer userId;
+    private Double refundAmount;
+    private String refundReason;
+    private String refundStatus;
+    private LocalDateTime requestedAt;
+    private LocalDateTime refundedAt;
+}

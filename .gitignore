@@ -1,0 +1,6 @@
+target/
+*.log
+*.class
+*.zip
+node_modules/
+.env

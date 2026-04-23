@@ -1,0 +1,11 @@
+package com.notification.service.dto;
+public class NotificationResponseDto {
+
+    private Integer notificationId;
+    private String message;
+    private String notificationType;
+    private LocalDateTime createdAt;
+    private String status;
+
+    private UserDto user;
+}

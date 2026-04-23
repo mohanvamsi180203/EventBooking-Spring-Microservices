@@ -1,0 +1,290 @@
+#server:
+#  port: 8080
+#
+#spring:
+#  application:
+#    name: API-GATEWAY
+#
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: AUTH-SERVICE
+#          uri: lb://AUTH-SERVICE
+#          predicates:
+#            - Path=/api/auth/**
+#
+#        - id: USER-SERVICE
+#          uri: lb://USER-SERVICE
+#          predicates:
+#            - Path=/api/user/**
+#
+#        - id: EVENT-SERVICE
+#          uri: lb://EVENT-SERVICE
+#          predicates:
+#            - Path=/api/event/**
+#
+#        - id: VENUE-SERVICE
+#          uri: lb://VENUE-SERVICE
+#          predicates:
+#            - Path=/api/venue/**
+#
+#        - id: BOOKING-SERVICE
+#          uri: lb://BOOKING-SERVICE
+#          predicates:
+#            - Path=/api/booking/**
+#
+#        - id: PAYMENT-SERVICE
+#          uri: lb://PAYMENT-SERVICE
+#          predicates:
+#            - Path=/api/payment/**
+#
+#        - id: QR-TICKET-SERVICE
+#          uri: lb://QR-TICKET-SERVICE
+#          predicates:
+#            - Path=/api/ticket/**
+#
+#        - id: NOTIFICATION-SERVICE
+#          uri: lb://NOTIFICATION-SERVICE
+#          predicates:
+#            - Path=/api/notification/**
+#
+#        - id: PRIVATE-ACCESS-SERVICE
+#          uri: lb://PRIVATE-ACCESS-SERVICE
+#          predicates:
+#            - Path=/api/privateAccess/**
+#
+#        - id: SEAT-SERVICE
+#          uri: lb://SEAT-SERVICE
+#          predicates:
+#            - Path=/api/seat/**
+#
+#        - id: REFUND-SERVICE
+#          uri: lb://REFUND-SERVICE
+#          predicates:
+#            - Path=/api/refund/**
+#
+#        - id: WISHLIST-SERVICE
+#          uri: lb://WISHLIST-SERVICE
+#          predicates:
+#            - Path=/api/wishlist/**
+#
+#        - id: SEARCH-SERVICE
+#          uri: lb://SEARCH-SERVICE
+#          predicates:
+#            - Path=/api/search/**
+#
+#        - id: EVENT-RECOMMENDATION-SERVICE
+#          uri: lb://EVENT-RECOMMENDATION-SERVICE
+#          predicates:
+#            - Path=/api/recommendation/**
+#
+#        - id: REPORTANALYTICS-SERVICE
+#          uri: lb://REPORTANALYTICS-SERVICE
+#          predicates:
+#            - Path=/api/report/**
+#
+#        - id: ORG-DASHBOARD-SERVICE
+#          uri: lb://ORG-DASHBOARD-SERVICE
+#          predicates:
+#            - Path=/api/dashboard/**
+#
+#        - id: GEMINI-AI-SERVICE
+#          uri: lb://GEMINI-AI-SERVICE
+#          predicates:
+#            - Path=/api/ai/**
+#
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka/
+
+
+
+
+
+
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: API-GATEWAY
+
+  cloud:
+    gateway:
+      routes:
+        - id: AUTH-SERVICE
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/api/auth/**
+
+        - id: AUTH-SWAGGER
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/api/auth/v3/api-docs,/api/auth/swagger-ui/**
+
+        - id: USER-SERVICE
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/user/**
+
+        - id: USER-SWAGGER
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/user/v3/api-docs,/api/user/swagger-ui/**
+
+        - id: EVENT-SERVICE
+          uri: lb://EVENT-SERVICE
+          predicates:
+            - Path=/api/event/**
+
+        - id: EVENT-SWAGGER
+          uri: lb://EVENT-SERVICE
+          predicates:
+            - Path=/api/event/v3/api-docs,/api/event/swagger-ui/**
+
+        - id: VENUE-SERVICE
+          uri: lb://VENUE-SERVICE
+          predicates:
+            - Path=/api/venue/**
+
+        - id: VENUE-SWAGGER
+          uri: lb://VENUE-SERVICE
+          predicates:
+            - Path=/api/venue/v3/api-docs,/api/venue/swagger-ui/**
+
+        - id: BOOKING-SERVICE
+          uri: lb://BOOKING-SERVICE
+          predicates:
+            - Path=/api/booking/**
+
+        - id: BOOKING-SWAGGER
+          uri: lb://BOOKING-SERVICE
+          predicates:
+            - Path=/api/booking/v3/api-docs,/api/booking/swagger-ui/**
+
+        - id: PAYMENT-SERVICE
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/api/payment/**
+
+        - id: PAYMENT-SWAGGER
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/api/payment/v3/api-docs,/api/payment/swagger-ui/**
+
+        - id: QR-TICKET-SERVICE
+          uri: lb://QR-TICKET-SERVICE
+          predicates:
+            - Path=/api/ticket/**
+
+        - id: QR-TICKET-SWAGGER
+          uri: lb://QR-TICKET-SERVICE
+          predicates:
+            - Path=/api/ticket/v3/api-docs,/api/ticket/swagger-ui/**
+
+        - id: NOTIFICATION-SERVICE
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/api/notification/**
+
+        - id: NOTIFICATION-SWAGGER
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/api/notification/v3/api-docs,/api/notification/swagger-ui/**
+
+        - id: PRIVATE-ACCESS-SERVICE
+          uri: lb://PRIVATE-ACCESS-SERVICE
+          predicates:
+            - Path=/api/privateAccess/**
+
+        - id: PRIVATE-ACCESS-SWAGGER
+          uri: lb://PRIVATE-ACCESS-SERVICE
+          predicates:
+            - Path=/api/privateAccess/v3/api-docs,/api/privateAccess/swagger-ui/**
+
+        - id: SEAT-SERVICE
+          uri: lb://SEAT-SERVICE
+          predicates:
+            - Path=/api/seat/**
+
+        - id: SEAT-SWAGGER
+          uri: lb://SEAT-SERVICE
+          predicates:
+            - Path=/api/seat/v3/api-docs,/api/seat/swagger-ui/**
+
+        - id: REFUND-SERVICE
+          uri: lb://REFUND-SERVICE
+          predicates:
+            - Path=/api/refund/**
+
+        - id: REFUND-SWAGGER
+          uri: lb://REFUND-SERVICE
+          predicates:
+            - Path=/api/refund/v3/api-docs,/api/refund/swagger-ui/**
+
+        - id: WISHLIST-SERVICE
+          uri: lb://WISHLIST-SERVICE
+          predicates:
+            - Path=/api/wishlist/**
+
+        - id: WISHLIST-SWAGGER
+          uri: lb://WISHLIST-SERVICE
+          predicates:
+            - Path=/api/wishlist/v3/api-docs,/api/wishlist/swagger-ui/**
+
+        - id: SEARCH-SERVICE
+          uri: lb://SEARCH-SERVICE
+          predicates:
+            - Path=/api/search/**
+
+        - id: SEARCH-SWAGGER
+          uri: lb://SEARCH-SERVICE
+          predicates:
+            - Path=/api/search/v3/api-docs,/api/search/swagger-ui/**
+
+        - id: EVENT-RECOMMENDATION-SERVICE
+          uri: lb://EVENT-RECOMMENDATION-SERVICE
+          predicates:
+            - Path=/api/recommendation/**
+
+        - id: EVENT-RECOMMENDATION-SWAGGER
+          uri: lb://EVENT-RECOMMENDATION-SERVICE
+          predicates:
+            - Path=/api/recommendation/v3/api-docs,/api/recommendation/swagger-ui/**
+
+        - id: REPORTANALYTICS-SERVICE
+          uri: lb://REPORTANALYTICS-SERVICE
+          predicates:
+            - Path=/api/report/**
+
+        - id: REPORTANALYTICS-SWAGGER
+          uri: lb://REPORTANALYTICS-SERVICE
+          predicates:
+            - Path=/api/report/v3/api-docs,/api/report/swagger-ui/**
+
+        - id: ORG-DASHBOARD-SERVICE
+          uri: lb://ORG-DASHBOARD-SERVICE
+          predicates:
+            - Path=/api/dashboard/**
+
+        - id: ORG-DASHBOARD-SWAGGER
+          uri: lb://ORG-DASHBOARD-SERVICE
+          predicates:
+            - Path=/api/dashboard/v3/api-docs,/api/dashboard/swagger-ui/**
+
+        - id: GEMINI-AI-SERVICE
+          uri: lb://GEMINI-AI-SERVICE
+          predicates:
+            - Path=/api/ai/**
+
+        - id: GEMINI-AI-SWAGGER
+          uri: lb://GEMINI-AI-SERVICE
+          predicates:
+            - Path=/api/ai/v3/api-docs,/api/ai/swagger-ui/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

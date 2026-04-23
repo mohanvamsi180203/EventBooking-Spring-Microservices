@@ -1,0 +1,11 @@
+package com.qrticket.service.service;
+public interface TicketService {
+
+    TicketResponseDto generateTicket(Integer bookingId);
+
+    TicketResponseDto getByBooking(Integer bookingId);
+
+    TicketResponseDto verifyTicket(String qrCodeText);
+
+    List<TicketResponseDto> viewAll();
+}

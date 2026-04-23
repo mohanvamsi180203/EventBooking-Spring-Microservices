@@ -1,0 +1,53 @@
+package com.booking.service.controller;
+@RestController
+@RequestMapping("/api/booking")
+public class BookingController {
+
+    @Autowired
+    private BookingService bookingService;
+
+    @PostMapping("/block")
+    public Booking blockTickets(@RequestBody Booking booking) {
+        return bookingService.blockTickets(booking);
+    }
+
+    @PutMapping("/confirm/{bookingId}")
+    public Booking confirmBooking(@PathVariable Integer bookingId) {
+        return bookingService.confirmBooking(bookingId);
+    }
+
+    @PutMapping("/cancel/{bookingId}")
+    public String cancelBooking(@PathVariable Integer bookingId) {
+        return bookingService.cancelBooking(bookingId);
+    }
+
+    @PutMapping("/expire/{bookingId}")
+    public String expireBooking(@PathVariable Integer bookingId) {
+        return bookingService.expireBooking(bookingId);
+    }
+
+    @GetMapping("/view")
+    public List<BookingResponseDto> viewAll() {
+        return bookingService.viewAll();
+    }
+
+    @GetMapping("/get/{id}")
+    public BookingResponseDto getById(@PathVariable Integer id) {
+        return bookingService.getById(id);
+    }
+
+    @GetMapping("/getByUser/{userId}")
+    public List<BookingResponseDto> getByUser(@PathVariable Integer userId) {
+        return bookingService.getByUser(userId);
+    }
+
+    @GetMapping("/getByEvent/{eventId}")
+    public List<BookingResponseDto> getByEvent(@PathVariable Integer eventId) {
+        return bookingService.getByEvent(eventId);
+    }
+
+    @GetMapping("/getByStatus/{status}")
+    public List<BookingResponseDto> getByStatus(@PathVariable String status) {
+        return bookingService.getByStatus(status);
+    }
+}

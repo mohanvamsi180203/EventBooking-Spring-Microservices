@@ -1,0 +1,81 @@
+@Service
+public class PaymentServiceImpl implements PaymentService {
+
+    @Value("${razorpay.key.id}")
+    private String keyId;
+
+    @Value("${razorpay.key.secret}")
+    private String keySecret;
+
+    @Autowired
+    private PaymentRepo paymentRepo;
+
+    @Autowired
+    private BookingClient bookingClient;
+
+    @Override
+    public String createOrder(Integer bookingId) throws Exception {
+
+        BookingDto booking = bookingClient.getById(bookingId);
+
+        if(booking == null) {
+            throw new RuntimeException("Booking Not Found");
+        }
+
+        if(booking.getBookingStatus().equals("BOOKED")) {
+            throw new RuntimeException("Booking Already Confirmed");
+        }
+
+        RazorpayClient razorpay = new RazorpayClient(keyId, keySecret);
+
+        JSONObject orderRequest = new JSONObject();
+
+        orderRequest.put("amount", booking.getTotalAmount() * 100);
+        orderRequest.put("currency", "INR");
+        orderRequest.put("receipt", "booking_" + bookingId);
+
+        Order order = razorpay.orders.create(orderRequest);
+
+        Payment payment = new Payment();
+
+        payment.setBookingId(bookingId);
+        payment.setRazorpayOrderId(order.get("id"));
+        payment.setAmount(booking.getTotalAmount());
+        payment.setPaymentStatus("CREATED");
+
+        paymentRepo.save(payment);
+
+        return order.toString();
+    }
+
+    @Override
+    public String verifyPayment(PaymentVerifyRequest request) {
+
+        Payment payment = paymentRepo.findByRazorpayOrderId(
+                request.getRazorpayOrderId());
+
+        if(payment == null) {
+            throw new RuntimeException("Payment Not Found");
+        }
+
+        payment.setRazorpayPaymentId(request.getRazorpayPaymentId());
+        payment.setPaymentStatus("SUCCESS");
+        payment.setPaymentDate(LocalDateTime.now());
+
+        paymentRepo.save(payment);
+
+        bookingClient.confirmBooking(payment.getBookingId());
+
+        return "Payment Successful And Booking Confirmed";
+    }
+
+    @Override
+    public List<Payment> viewAll() {
+        return paymentRepo.findAll();
+    }
+
+    @Override
+    public Payment getById(Integer id) {
+        return paymentRepo.findById(id).orElse(null);
+    }
+}

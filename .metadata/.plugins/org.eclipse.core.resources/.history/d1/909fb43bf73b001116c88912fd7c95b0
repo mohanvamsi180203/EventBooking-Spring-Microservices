@@ -1,0 +1,5 @@
+public class RefundRequestDto {
+
+    private Integer bookingId;
+    private String refundReason;
+}

@@ -1,0 +1,13 @@
+package com.organizer.dashboard.service;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class OrgDashboardServiceApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(OrgDashboardServiceApplication.class, args);
+	}
+
+}

@@ -1,0 +1,4 @@
+public interface PaymentRepo extends JpaRepository<Payment, Integer> {
+
+    Payment findByRazorpayOrderId(String razorpayOrderId);
+}

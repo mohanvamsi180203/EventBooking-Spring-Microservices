@@ -1,0 +1,140 @@
+package com.search.service.service;
+
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.search.service.client.EventClient;
+import com.search.service.client.VenueClient;
+import com.search.service.dto.EventDto;
+import com.search.service.dto.SearchResponseDto;
+import com.search.service.dto.VenueDto;
+
+@Service
+public class SearchServiceImpl implements SearchService {
+
+    @Autowired
+    private EventClient eventClient;
+
+    @Autowired
+    private VenueClient venueClient;
+
+    @Override
+    public List<SearchResponseDto> searchByName(String name) {
+
+        List<EventDto> events = eventClient.viewAll();
+
+        return events.stream()
+                .filter(event -> event.getStatus().equals("UPCOMING"))
+                .filter(event -> event.getEventName().toLowerCase()
+                        .contains(name.toLowerCase()))
+                .map(this::mapSearchResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SearchResponseDto> searchByCategory(String category) {
+
+        List<EventDto> events = eventClient.viewAll();
+
+        return events.stream()
+                .filter(event -> event.getStatus().equals("UPCOMING"))
+                .filter(event -> event.getCategory().equalsIgnoreCase(category))
+                .map(this::mapSearchResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SearchResponseDto> searchByCity(String city) {
+
+        List<EventDto> events = eventClient.viewAll();
+
+        return events.stream()
+                .filter(event -> event.getStatus().equals("UPCOMING"))
+                .filter(event -> {
+                    VenueDto venue = venueClient.getById(event.getVenueId());
+                    return venue.getLocation().equalsIgnoreCase(city);
+                })
+                .map(this::mapSearchResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SearchResponseDto> searchByDate(LocalDate date) {
+
+        List<EventDto> events = eventClient.viewAll();
+
+        return events.stream()
+                .filter(event -> event.getStatus().equals("UPCOMING"))
+                .filter(event -> event.getEventDate().equals(date))
+                .map(this::mapSearchResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SearchResponseDto> searchByPrice(Double min, Double max) {
+
+        List<EventDto> events = eventClient.viewAll();
+
+        return events.stream()
+                .filter(event -> event.getStatus().equals("UPCOMING"))
+                .filter(event -> event.getTicketPrice() >= min
+                        && event.getTicketPrice() <= max)
+                .map(this::mapSearchResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SearchResponseDto> searchByStatus(String status) {
+
+        List<EventDto> events = eventClient.viewAll();
+
+        return events.stream()
+                .filter(event -> event.getStatus().equalsIgnoreCase(status))
+                .map(this::mapSearchResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SearchResponseDto> searchByType(String eventType) {
+
+        List<EventDto> events = eventClient.viewAll();
+
+        return events.stream()
+                .filter(event -> event.getStatus().equals("UPCOMING"))
+                .filter(event -> event.getEventType().equalsIgnoreCase(eventType))
+                .filter(event -> event.getVenueId() != null)
+                .map(this::mapSearchResponse)
+                .collect(Collectors.toList());
+    }
+
+    
+    private SearchResponseDto mapSearchResponse(EventDto event) {
+
+        VenueDto venue = null;
+
+        if(event.getVenueId() != null) {
+            venue = venueClient.getById(event.getVenueId());
+        }
+
+        SearchResponseDto response = new SearchResponseDto();
+
+        response.setEventId(event.getEventId());
+        response.setEventName(event.getEventName());
+        response.setCategory(event.getCategory());
+        response.setEventDate(event.getEventDate());
+        response.setTicketPrice(event.getTicketPrice());
+        response.setStatus(event.getStatus());
+        response.setEventType(event.getEventType());
+
+        if(venue != null) {
+            response.setCity(venue.getLocation());
+        }
+
+        return response;
+    }
+}

@@ -1,0 +1,34 @@
+@RestController
+@RequestMapping("/api/refund")
+public class RefundController {
+
+    @Autowired
+    private RefundService refundService;
+
+    @PostMapping("/request")
+    public RefundResponseDto requestRefund(
+            @RequestBody RefundRequestDto request) {
+
+        return refundService.requestRefund(request);
+    }
+
+    @GetMapping("/view")
+    public List<RefundResponseDto> viewAll() {
+        return refundService.viewAll();
+    }
+
+    @GetMapping("/get/{id}")
+    public RefundResponseDto getById(@PathVariable Integer id) {
+        return refundService.getById(id);
+    }
+
+    @GetMapping("/getByUser/{userId}")
+    public List<RefundResponseDto> getByUser(@PathVariable Integer userId) {
+        return refundService.getByUser(userId);
+    }
+
+    @GetMapping("/getByStatus/{status}")
+    public List<RefundResponseDto> getByStatus(@PathVariable String status) {
+        return refundService.getByStatus(status);
+    }
+}

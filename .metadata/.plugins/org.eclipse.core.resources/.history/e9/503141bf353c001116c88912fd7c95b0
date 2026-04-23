@@ -1,0 +1,7 @@
+package com.qrticket.service.client;
+@FeignClient(name = "BOOKING-SERVICE")
+public interface BookingClient {
+
+    @GetMapping("/api/booking/getEntity/{id}")
+    BookingDto getById(@PathVariable("id") Integer id);
+}

@@ -1,0 +1,43 @@
+@RestController
+@RequestMapping("/api/seat")
+public class SeatController {
+
+    @Autowired
+    private SeatService seatService;
+
+    @PostMapping("/create")
+    public List<Seat> createSeats(
+            @RequestBody SeatCreateRequest request) {
+
+        return seatService.createSeats(request);
+    }
+
+    @GetMapping("/event/{eventId}")
+    public List<Seat> getSeatsByEvent(
+            @PathVariable Integer eventId) {
+
+        return seatService.getSeatsByEvent(eventId);
+    }
+
+    @PutMapping("/lock/{userId}")
+    public List<Seat> lockSeats(
+            @PathVariable Integer userId,
+            @RequestBody List<Integer> seatIds) {
+
+        return seatService.lockSeats(userId, seatIds);
+    }
+
+    @PutMapping("/confirm")
+    public List<Seat> confirmSeats(
+            @RequestBody List<Integer> seatIds) {
+
+        return seatService.confirmSeats(seatIds);
+    }
+
+    @PutMapping("/release")
+    public List<Seat> releaseSeats(
+            @RequestBody List<Integer> seatIds) {
+
+        return seatService.releaseSeats(seatIds);
+    }
+}

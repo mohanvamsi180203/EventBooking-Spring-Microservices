@@ -1,0 +1,27 @@
+package com.chat.service.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.chat.service.dto.ChatResponseDto;
+import com.google.genai.Client;
+import com.google.genai.types.GenerateContentResponse;
+
+@Service
+public class ChatServiceImpl implements ChatService {
+
+    @Autowired
+    private Client client;
+
+    @Override
+    public ChatResponseDto askQuestion(String message) {
+
+        GenerateContentResponse response = client.models.generateContent(
+                "gemini-2.5-flash",
+                message,
+                null
+        );
+
+        return new ChatResponseDto(response.text());
+    }
+}

@@ -1,0 +1,16 @@
+spring.application.name=Auth-service
+
+
+
+spring.datasource.url=jdbc:mysql://localhost:3306/authdatabase?createDatabaseIfNotExist=true
+spring.datasource.username=root
+spring.datasource.password=1234
+spring.jpa.hibernate.ddl-auto=update
+
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
+
+server.port=8081
+

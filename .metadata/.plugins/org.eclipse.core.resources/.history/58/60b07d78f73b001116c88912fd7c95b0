@@ -1,0 +1,12 @@
+public interface RefundService {
+
+    RefundResponseDto requestRefund(RefundRequestDto request);
+
+    List<RefundResponseDto> viewAll();
+
+    RefundResponseDto getById(Integer id);
+
+    List<RefundResponseDto> getByUser(Integer userId);
+
+    List<RefundResponseDto> getByStatus(String status);
+}

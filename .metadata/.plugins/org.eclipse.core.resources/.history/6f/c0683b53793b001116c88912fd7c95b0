@@ -1,0 +1,37 @@
+@RestController
+@RequestMapping("/api/notification")
+public class NotificationController {
+
+    @Autowired
+    private NotificationService notificationService;
+
+    @PostMapping("/send")
+    public NotificationResponseDto sendNotification(@RequestBody Notification notification) {
+        return notificationService.sendNotification(notification);
+    }
+
+    @GetMapping("/view")
+    public List<NotificationResponseDto> viewAll() {
+        return notificationService.viewAll();
+    }
+
+    @GetMapping("/get/{id}")
+    public NotificationResponseDto getById(@PathVariable Integer id) {
+        return notificationService.getById(id);
+    }
+
+    @GetMapping("/getByUser/{userId}")
+    public List<NotificationResponseDto> getByUser(@PathVariable Integer userId) {
+        return notificationService.getByUser(userId);
+    }
+
+    @GetMapping("/getByStatus/{status}")
+    public List<NotificationResponseDto> getByStatus(@PathVariable String status) {
+        return notificationService.getByStatus(status);
+    }
+
+    @PutMapping("/markAsRead/{id}")
+    public NotificationResponseDto markAsRead(@PathVariable Integer id) {
+        return notificationService.markAsRead(id);
+    }
+}

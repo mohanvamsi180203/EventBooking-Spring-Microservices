@@ -1,0 +1,7 @@
+package com.booking.service.client;
+@FeignClient(name = "VENUE-SERVICE")
+public interface VenueClient {
+
+    @GetMapping("/api/venue/get/{id}")
+    VenueDto getById(@PathVariable Integer id);
+}

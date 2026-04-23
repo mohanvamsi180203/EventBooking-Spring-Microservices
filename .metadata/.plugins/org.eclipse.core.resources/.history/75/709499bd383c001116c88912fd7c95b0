@@ -1,0 +1,11 @@
+@Data
+public class TicketResponseDto {
+
+    private Integer ticketId;
+    private Integer bookingId;
+    private Integer userId;
+    private Integer eventId;
+    private String qrCodeText;
+    private String qrImagePath;
+    private String ticketStatus;
+}

@@ -1,0 +1,208 @@
+package com.example.demo.service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.client.EventClient;
+import com.example.demo.client.NotificationClient;
+import com.example.demo.client.UserClient;
+import com.example.demo.dto.EventDto;
+import com.example.demo.dto.NotificationDto;
+import com.example.demo.dto.PrivateAccessResponseDto;
+import com.example.demo.dto.UserDto;
+import com.example.demo.entity.PrivateAccess;
+import com.example.demo.repo.PrivateAccessRepo;
+
+@Service
+public class PrivateAccessServiceImpl implements PrivateAccessService {
+
+    @Autowired
+    private PrivateAccessRepo privateAccessRepo;
+
+    @Autowired
+    private UserClient userClient;
+
+    @Autowired
+    private EventClient eventClient;
+
+    
+    @Autowired
+    private NotificationClient notificationClient;
+    
+    @Override
+    public PrivateAccessResponseDto inviteUser(PrivateAccess access) {
+
+        UserDto user = userClient.getUserEntityById(access.getUserId());
+
+        if(user == null) {
+            throw new RuntimeException("User Not Found");
+        }
+
+        EventDto event = eventClient.getEventEntityById(access.getEventId());
+
+        if(event == null) {
+            throw new RuntimeException("Event Not Found");
+        }
+
+        if(!event.getEventType().equals("PRIVATE")) {
+            throw new RuntimeException("Only Private Events Can Have Invitations");
+        }
+
+        PrivateAccess existing = privateAccessRepo.findByEventIdAndUserId(
+                access.getEventId(),
+                access.getUserId());
+
+        if(existing != null) {
+            throw new RuntimeException("User Already Invited");
+        }
+
+        access.setInvitationStatus("PENDING");
+
+        PrivateAccess savedAccess = privateAccessRepo.save(access);
+        
+        String acceptLink = "http://localhost:8086/api/privateaccess/accept/" 
+                + savedAccess.getAccessId();
+
+        String rejectLink = "http://localhost:8086/api/privateaccess/reject/" 
+                + savedAccess.getAccessId();
+
+        NotificationDto notification = new NotificationDto();
+
+        notification.setUserId(user.getUserId());
+        notification.setNotificationType("PRIVATE_EVENT_INVITATION");
+
+        notification.setMessage(
+                "You have been invited to a private event.\n\n" +
+                "Event Name: " + event.getEventName() +
+                "\nCategory: " + event.getCategory() +
+                "\nCity: " + event.getCity() +
+                "\nEvent Date: " + event.getEventDate() +
+                "\n\nTo accept invitation click below:\n" +
+                acceptLink +
+                "\n\nTo reject invitation click below:\n" +
+                rejectLink
+        );
+
+        notificationClient.sendNotification(notification);
+
+        PrivateAccessResponseDto response = new PrivateAccessResponseDto();
+
+        response.setAccessId(savedAccess.getAccessId());
+        response.setInvitationStatus(savedAccess.getInvitationStatus());
+        response.setUser(user);
+        response.setEvent(event);
+
+        return response;
+    }
+
+    @Override
+    public PrivateAccessResponseDto acceptInvitation(Integer accessId) {
+
+        PrivateAccess access = privateAccessRepo.findById(accessId).orElse(null);
+
+        if(access == null) {
+            throw new RuntimeException("Invitation Not Found");
+        }
+
+        access.setInvitationStatus("ACCEPTED");
+        NotificationDto notification = new NotificationDto();
+
+        UserDto user = userClient.getUserEntityById(access.getUserId());
+
+        EventDto event = eventClient.getEventEntityById(access.getEventId());
+
+        notification.setUserId(user.getUserId());
+        notification.setNotificationType("PRIVATE_EVENT_INVITATION");
+
+        notification.setMessage(
+                "You have been ACCEPTED invitation to a private event.Now you are eligibe for booking.\n\n" +
+                "Event Name: " + event.getEventName() +
+                "\nCategory: " + event.getCategory() +
+                "\nCity: " + event.getCity() +
+                "\nEvent Date: " + event.getEventDate() +
+               "In"
+        );
+
+        notificationClient.sendNotification(notification);
+
+        PrivateAccess savedAccess = privateAccessRepo.save(access);
+
+        return mapPrivateAccess(savedAccess);
+    }
+
+    @Override
+    public PrivateAccessResponseDto rejectInvitation(Integer accessId) {
+
+        PrivateAccess access = privateAccessRepo.findById(accessId).orElse(null);
+
+        if(access == null) {
+            throw new RuntimeException("Invitation Not Found");
+        }
+
+        access.setInvitationStatus("REJECTED");
+
+        PrivateAccess savedAccess = privateAccessRepo.save(access);
+
+        return mapPrivateAccess(savedAccess);
+    }
+
+    @Override
+    public List<PrivateAccessResponseDto> viewAll() {
+
+        List<PrivateAccess> accessList = privateAccessRepo.findAll();
+
+        return accessList.stream().map(this::mapPrivateAccess)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public PrivateAccessResponseDto getById(Integer id) {
+
+        PrivateAccess access = privateAccessRepo.findById(id).orElse(null);
+
+        return mapPrivateAccess(access);
+    }
+
+    @Override
+    public List<PrivateAccessResponseDto> getByUser(Integer userId) {
+
+        List<PrivateAccess> accessList = privateAccessRepo.findByUserId(userId);
+
+        return accessList.stream().map(this::mapPrivateAccess)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PrivateAccessResponseDto> getByEvent(Integer eventId) {
+
+        List<PrivateAccess> accessList = privateAccessRepo.findByEventId(eventId);
+
+        return accessList.stream().map(this::mapPrivateAccess)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public PrivateAccess getByEventAndUser(Integer eventId, Integer userId) {
+
+        return privateAccessRepo.findByEventIdAndUserId(eventId, userId);
+    }
+
+    private PrivateAccessResponseDto mapPrivateAccess(PrivateAccess access) {
+
+        UserDto user = userClient.getUserEntityById(access.getUserId());
+
+        EventDto event = eventClient.getEventEntityById(access.getEventId());
+
+        PrivateAccessResponseDto response = new PrivateAccessResponseDto();
+
+        response.setAccessId(access.getAccessId());
+        response.setInvitationStatus(access.getInvitationStatus());
+        response.setUser(user);
+        response.setEvent(event);
+
+        return response;
+    }
+}

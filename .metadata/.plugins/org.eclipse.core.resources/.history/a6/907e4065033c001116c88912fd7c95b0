@@ -1,0 +1,8 @@
+package com.chat.service.service;
+
+import com.chat.service.dto.ChatResponseDto;
+
+public interface ChatService {
+
+    ChatResponseDto askQuestion(String message);
+}

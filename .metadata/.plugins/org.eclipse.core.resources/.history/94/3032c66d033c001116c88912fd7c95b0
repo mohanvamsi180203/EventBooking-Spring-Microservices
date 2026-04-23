@@ -1,0 +1,8 @@
+package com.gemini.ai.service.service;
+
+import com.chat.service.dto.ChatResponseDto;
+
+public interface ChatService {
+
+    ChatResponseDto askQuestion(String message);
+}

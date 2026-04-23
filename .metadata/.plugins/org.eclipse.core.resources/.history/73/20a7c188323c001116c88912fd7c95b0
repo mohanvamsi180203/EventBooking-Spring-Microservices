@@ -1,0 +1,7 @@
+package com.reportanalytics.service.dto;
+@Data
+public class RefundDto {
+
+    private Integer refundId;
+    private Double refundAmount;
+}

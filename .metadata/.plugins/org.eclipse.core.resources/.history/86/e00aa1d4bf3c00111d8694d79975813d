@@ -1,0 +1,83 @@
+@Service
+
+public class SeatServiceImpl implements SeatService {
+
+    @Autowired
+    private SeatRepo seatRepo;
+
+    @Override
+    public List<Seat> createSeats(SeatCreateRequest request) {
+
+        List<Seat> seatList = new ArrayList<>();
+
+            for(int col = 1; col <= request.getTotalColumns(); col++) {
+
+                Seat seat = new Seat();
+
+                seat.setEventId(request.getEventId());
+                seat.setRowNumber(String.valueOf(rowLetter));
+                seat.setColumnNumber(col);
+                seat.setSeatLabel(rowLetter + String.valueOf(col));
+                seat.setPrice(request.getPrice());
+                seat.setStatus("AVAILABLE");
+
+                seatList.add(seat);
+            }
+        }
+
+        return seatRepo.saveAll(seatList);
+    }
+
+    @Override
+    public List<Seat> getSeatsByEvent(Integer eventId) {
+        return seatRepo.findByEventId(eventId);
+    }
+
+    @Override
+    public List<Seat> lockSeats(Integer userId, List<Integer> seatIds) {
+
+        List<Seat> seats = seatRepo.findAllById(seatIds);
+
+        for(Seat seat : seats) {
+
+            if(!seat.getStatus().equalsIgnoreCase("AVAILABLE")) {
+                throw new RuntimeException(
+                        "Seat Already Locked Or Booked: " + seat.getSeatLabel());
+            }
+
+            seat.setStatus("LOCKED");
+            seat.setLockedBy(userId);
+            seat.setLockedUntil(LocalDateTime.now().plusMinutes(5));
+        }
+
+        return seatRepo.saveAll(seats);
+    }
+
+    @Override
+    public List<Seat> confirmSeats(List<Integer> seatIds) {
+
+        List<Seat> seats = seatRepo.findAllById(seatIds);
+
+        for(Seat seat : seats) {
+            seat.setStatus("BOOKED");
+            seat.setLockedBy(null);
+            seat.setLockedUntil(null);
+        }
+
+        return seatRepo.saveAll(seats);
+    }
+
+    @Override
+    public List<Seat> releaseSeats(List<Integer> seatIds) {
+
+        List<Seat> seats = seatRepo.findAllById(seatIds);
+
+        for(Seat seat : seats) {
+            seat.setStatus("AVAILABLE");
+            seat.setLockedBy(null);
+            seat.setLockedUntil(null);
+        }
+
+        return seatRepo.saveAll(seats);
+    }
+}

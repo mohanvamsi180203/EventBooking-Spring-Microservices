@@ -1,0 +1,214 @@
+package com.booking.service.service;
+@Service
+public class BookingServiceImpl implements BookingService {
+
+    @Autowired
+    private BookingRepo bookingRepo;
+
+    @Autowired
+    private UserClient userClient;
+
+    @Autowired
+    private EventClient eventClient;
+
+    @Autowired
+    private VenueClient venueClient;
+
+    @Override
+    public Booking blockTickets(Booking booking) {
+
+        UserDto user = userClient.getUserEntityById(booking.getUserId());
+
+        if(user == null) {
+            throw new RuntimeException("User Not Found");
+        }
+
+        EventDto event = eventClient.getEventEntityById(booking.getEventId());
+
+        if(event == null) {
+            throw new RuntimeException("Event Not Found");
+        }
+
+        if(event.getStatus().equals("CANCELLED")) {
+            throw new RuntimeException("Cannot Book Cancelled Event");
+        }
+
+        if(event.getStatus().equals("COMPLETED")) {
+            throw new RuntimeException("Cannot Book Completed Event");
+        }
+
+        if(event.getAvailableTickets() < booking.getQuantity()) {
+            throw new RuntimeException("Not Enough Tickets Available");
+        }
+
+        Double totalAmount = booking.getQuantity() * event.getTicketPrice();
+
+        booking.setTotalAmount(totalAmount);
+        booking.setBookingDate(LocalDate.now());
+        booking.setBookingStatus("BLOCKED");
+        booking.setLockedUntil(LocalDateTime.now().plusMinutes(5));
+
+        eventClient.reduceAvailableTickets(
+                booking.getEventId(),
+                booking.getQuantity());
+
+        return bookingRepo.save(booking);
+    }
+
+    @Override
+    public Booking confirmBooking(Integer bookingId) {
+
+        Booking booking = bookingRepo.findById(bookingId).orElse(null);
+
+        if(booking == null) {
+            throw new RuntimeException("Booking Not Found");
+        }
+
+        if(booking.getBookingStatus().equals("BOOKED")) {
+            throw new RuntimeException("Booking Already Confirmed");
+        }
+
+        if(booking.getBookingStatus().equals("CANCELLED")) {
+            throw new RuntimeException("Cancelled Booking Cannot Be Confirmed");
+        }
+
+        if(booking.getBookingStatus().equals("EXPIRED")) {
+            throw new RuntimeException("Booking Already Expired");
+        }
+
+        if(LocalDateTime.now().isAfter(booking.getLockedUntil())) {
+
+            booking.setBookingStatus("EXPIRED");
+
+            bookingRepo.save(booking);
+
+            eventClient.increaseAvailableTickets(
+                    booking.getEventId(),
+                    booking.getQuantity());
+
+            throw new RuntimeException("Booking Expired");
+        }
+
+        booking.setBookingStatus("BOOKED");
+
+        return bookingRepo.save(booking);
+    }
+
+    @Override
+    public String cancelBooking(Integer bookingId) {
+
+        Booking booking = bookingRepo.findById(bookingId).orElse(null);
+
+        if(booking == null) {
+            throw new RuntimeException("Booking Not Found");
+        }
+
+        if(booking.getBookingStatus().equals("CANCELLED")) {
+            return "Booking Already Cancelled";
+        }
+
+        booking.setBookingStatus("CANCELLED");
+
+        bookingRepo.save(booking);
+
+        eventClient.increaseAvailableTickets(
+                booking.getEventId(),
+                booking.getQuantity());
+
+        return "Booking Cancelled Successfully";
+    }
+
+    @Override
+    public String expireBooking(Integer bookingId) {
+
+        Booking booking = bookingRepo.findById(bookingId).orElse(null);
+
+        if(booking == null) {
+            throw new RuntimeException("Booking Not Found");
+        }
+
+        if(LocalDateTime.now().isAfter(booking.getLockedUntil())
+                && booking.getBookingStatus().equals("BLOCKED")) {
+
+            booking.setBookingStatus("EXPIRED");
+
+            bookingRepo.save(booking);
+
+            eventClient.increaseAvailableTickets(
+                    booking.getEventId(),
+                    booking.getQuantity());
+
+            return "Booking Expired And Tickets Released";
+        }
+
+        return "Booking Still Active";
+    }
+
+    @Override
+    public List<BookingResponseDto> viewAll() {
+
+        List<Booking> bookings = bookingRepo.findAll();
+
+        return bookings.stream().map(this::mapBookingResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public BookingResponseDto getById(Integer id) {
+
+        Booking booking = bookingRepo.findById(id).orElse(null);
+
+        return mapBookingResponse(booking);
+    }
+
+    @Override
+    public List<BookingResponseDto> getByUser(Integer userId) {
+
+        List<Booking> bookings = bookingRepo.findByUserId(userId);
+
+        return bookings.stream().map(this::mapBookingResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BookingResponseDto> getByEvent(Integer eventId) {
+
+        List<Booking> bookings = bookingRepo.findByEventId(eventId);
+
+        return bookings.stream().map(this::mapBookingResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BookingResponseDto> getByStatus(String status) {
+
+        List<Booking> bookings = bookingRepo.findByBookingStatus(status);
+
+        return bookings.stream().map(this::mapBookingResponse)
+                .collect(Collectors.toList());
+    }
+
+    private BookingResponseDto mapBookingResponse(Booking booking) {
+
+        UserDto user = userClient.getUserEntityById(booking.getUserId());
+
+        EventDto event = eventClient.getEventEntityById(booking.getEventId());
+
+        VenueDto venue = venueClient.getById(event.getVenueId());
+
+        BookingResponseDto response = new BookingResponseDto();
+
+        response.setBookingId(booking.getBookingId());
+        response.setQuantity(booking.getQuantity());
+        response.setTotalAmount(booking.getTotalAmount());
+        response.setBookingDate(booking.getBookingDate());
+        response.setBookingStatus(booking.getBookingStatus());
+        response.setLockedUntil(booking.getLockedUntil());
+
+        response.setUser(user);
+        response.setEvent(event);
+        response.setVenue(venue);
+
+        return response;
+    }
+}

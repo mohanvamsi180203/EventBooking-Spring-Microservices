@@ -1,0 +1,24 @@
+@Entity
+@Data
+public class Seat {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer seatId;
+
+    private Integer eventId;
+
+    private String rowNumber;
+
+    private Integer columnNumber;
+
+    private String seatLabel;
+
+    private Double price;
+
+    private String status;
+
+    private Integer lockedBy;
+
+    private LocalDateTime lockedUntil;
+}

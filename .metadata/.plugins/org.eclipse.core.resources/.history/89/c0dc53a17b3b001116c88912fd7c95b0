@@ -1,0 +1,8 @@
+public interface WishlistRepo extends JpaRepository<Wishlist, Integer> {
+
+    List<Wishlist> findByUserId(Integer userId);
+
+    List<Wishlist> findByEventId(Integer eventId);
+
+    Wishlist findByUserIdAndEventId(Integer userId, Integer eventId);
+}

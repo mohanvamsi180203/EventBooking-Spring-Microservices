@@ -1,0 +1,246 @@
+package com.auth.service.service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.auth.service.client.NotificationClient;
+import com.auth.service.client.UserClient;
+import com.auth.service.dto.NotificationDto;
+import com.auth.service.dto.VerifyOtpRequest;
+import com.auth.service.entity.Auth;
+import com.auth.service.repo.AuthRepo;
+
+@Service
+public class AuthServiceImpl implements AuthService {
+
+    @Autowired
+    private AuthRepo authRepo;
+    
+    @Autowired
+    private NotificationClient notificationClient;
+    
+    @Autowired
+    private UserClient userClient;
+
+//    @Override
+//    public Auth register(Auth auth) {
+//
+//        if(authRepo.existsByEmail(auth.getEmail())) {
+//            throw new RuntimeException("Email Already Exists");
+//        }
+//
+//        if(authRepo.existsByUsername(auth.getUsername())) {
+//            throw new RuntimeException("Username Already Exists");
+//        }
+//
+//        if(auth.getPassword().length() < 6) {
+//            throw new RuntimeException("Password Must Be At Least 6 Characters");
+//        }
+//        
+//        
+//        String otp = generateOtp();
+//
+//        auth.setOtp(otp);
+//        auth.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
+//        auth.setEmailVerified(false);
+//  
+//
+//        return authRepo.save(auth);
+//    }
+
+    @Override
+    public Auth register(Auth auth) {
+
+        if(authRepo.existsByEmail(auth.getEmail())) {
+            throw new RuntimeException("Email Already Exists");
+        }
+
+        if(authRepo.existsByUsername(auth.getUsername())) {
+            throw new RuntimeException("Username Already Exists");
+        }
+
+        if(auth.getPassword().length() < 6) {
+            throw new RuntimeException("Password Must Be At Least 6 Characters");
+        }
+
+        String otp = generateOtp();
+
+        auth.setOtp(otp);
+        auth.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
+        auth.setEmailVerified(false);
+        auth.setRole("USER");
+        auth.setOrganizerStatus(null);
+
+        Auth savedAuth = authRepo.save(auth);
+
+        UserDto user = new UserDto();
+        user.setUserId(savedAuth.getUserId());
+        user.setName(savedAuth.getUsername());
+        user.setEmail(savedAuth.getEmail());
+
+        userClient.createUser(user);
+
+        NotificationDto notification = new NotificationDto();
+
+        notification.setEmail(savedAuth.getEmail());
+        notification.setNotificationType("EMAIL_VERIFICATION");
+        notification.setMessage(
+                "Welcome to Event Booking Platform.\n\n" +
+                "Your OTP for email verification is: " + otp +
+                "\n\nThis OTP will expire in 5 minutes."
+        );
+
+        notificationClient.sendNotification(notification);
+
+        return savedAuth;
+    }
+    @Override
+    public String login(String email, String password) {
+
+        Auth auth = authRepo.findByEmail(email);
+
+        if(auth.getEmailVerified() == null || !auth.getEmailVerified()) {
+            throw new RuntimeException("Please Verify Your Email First");
+        }
+        
+        if(auth != null && auth.getPassword().equals(password)) {
+            return "Login Successful";
+        }
+
+        return "Invalid Email Or Password";
+    }
+
+    @Override
+    public List<Auth> viewAll() {
+        return authRepo.findAll();
+    }
+
+    @Override
+    public Auth getById(Integer id) {
+        return authRepo.findById(id).orElse(null);
+    }
+
+    @Override
+    public Auth getByEmail(String email) {
+        return authRepo.findByEmail(email);
+    }
+
+    @Override
+    public String deleteUser(Integer id) {
+        authRepo.deleteById(id);
+        return "User Deleted Successfully";
+    }
+    
+    
+    private String generateOtp() {
+        return String.valueOf((int)(Math.random() * 900000) + 100000);
+    }
+    
+    @Override
+    public String verifyOtp(VerifyOtpRequest request) {
+
+        Auth user = authRepo.findByEmail(request.getEmail());
+
+        if(user == null) {
+            throw new RuntimeException("User Not Found");
+        }
+
+        if(user.getEmailVerified() != null && user.getEmailVerified()) {
+            throw new RuntimeException("Email Already Verified");
+        }
+
+        if(!user.getOtp().equals(request.getOtp())) {
+            throw new RuntimeException("Invalid OTP");
+        }
+
+        if(user.getOtpExpiry().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("OTP Expired");
+        }
+
+        user.setEmailVerified(true);
+        user.setOtp(null);
+        user.setOtpExpiry(null);
+
+        authRepo.save(user);
+
+        return "Email Verified Successfully";
+    }
+    
+    
+    @Override
+    public String applyOrganizer(Integer userId) {
+
+        Auth user = authRepo.findById(userId).orElse(null);
+
+        if(user == null) {
+            throw new RuntimeException("User Not Found");
+        }
+
+        user.setRole("ORGANIZER");
+        user.setOrganizerStatus("PENDING");
+
+        authRepo.save(user);
+
+        return "Organizer Request Submitted Successfully";
+    }
+    
+    
+    @Override
+    public String approveOrganizer(Integer userId) {
+
+        Auth user = authRepo.findById(userId).orElse(null);
+
+        if(user == null) {
+            throw new RuntimeException("User Not Found");
+        }
+
+        user.setOrganizerStatus("APPROVED");
+
+        authRepo.save(user);
+
+        NotificationDto notification = new NotificationDto();
+
+        notification.setUserId(user.getAuthId());
+        notification.setNotificationType("ORGANIZER_APPROVED");
+        notification.setMessage(
+                "Congratulations!\n\n" +
+                "Your organizer request has been approved.\n" +
+                "Now you can create and host events."
+        );
+
+        notificationClient.sendNotification(notification);
+
+        return "Organizer Approved Successfully";
+    }
+    
+    
+    
+    @Override
+    public String rejectOrganizer(Integer userId) {
+
+        Auth user = authRepo.findById(userId).orElse(null);
+
+        if(user == null) {
+            throw new RuntimeException("User Not Found");
+        }
+
+        user.setOrganizerStatus("REJECTED");
+
+        authRepo.save(user);
+
+        NotificationDto notification = new NotificationDto();
+
+        notification.setUserId(user.getAuthId());
+        notification.setNotificationType("ORGANIZER_REJECTED");
+        notification.setMessage(
+                "Your organizer request has been rejected by admin."
+        );
+
+        notificationClient.sendNotification(notification);
+
+        return "Organizer Rejected Successfully";
+    }
+}

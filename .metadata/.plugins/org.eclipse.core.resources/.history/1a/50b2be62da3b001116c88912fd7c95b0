@@ -1,0 +1,7 @@
+package com.search.service.client;
+@FeignClient(name = "EVENT-SERVICE")
+public interface EventClient {
+
+    @GetMapping("/api/event/view")
+    List<EventDto> viewAll();
+}

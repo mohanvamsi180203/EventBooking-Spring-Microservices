@@ -1,0 +1,7 @@
+package com.seat.service.repo;
+public interface SeatRepo extends JpaRepository<Seat, Integer> {
+
+    List<Seat> findByEventId(Integer eventId);
+
+    List<Seat> findByEventIdAndStatus(Integer eventId, String status);
+}

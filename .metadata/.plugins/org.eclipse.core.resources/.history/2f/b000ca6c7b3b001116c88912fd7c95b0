@@ -1,0 +1,11 @@
+@Entity
+public class Wishlist {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer wishlistId;
+
+    private Integer userId;
+    private Integer eventId;
+    private LocalDate addedDate;
+}

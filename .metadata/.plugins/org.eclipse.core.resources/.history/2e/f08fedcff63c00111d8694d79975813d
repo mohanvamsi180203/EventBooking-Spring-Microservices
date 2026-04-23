@@ -1,0 +1,479 @@
+package com.event.service.service;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.event.service.client.AuthClient;
+import com.event.service.client.UserClient;
+import com.event.service.client.VenueClient;
+import com.event.service.dto.EventResponseDto;
+import com.event.service.dto.UserDto;
+import com.event.service.dto.VenueDto;
+import com.event.service.entity.Event;
+import com.event.service.repo.EventRepo;
+
+@Service
+public class EventServiceImpl implements EventService {
+
+    @Autowired
+    private EventRepo eventRepo;
+
+    @Autowired
+    private VenueClient venueClient;
+    
+    @Autowired
+    UserClient userClient;
+
+    @Autowired
+    private AuthClient authClient;
+    @Override
+    public Event addEvent(Event event) {
+    	
+    	
+    	
+    	UserDto organizer = authClient.getById(event.getOrganizerId());
+
+    	if(organizer == null) {
+    	    throw new RuntimeException("Organizer Not Found");
+    	}
+    	
+    	if(organizer.getRole() == null ||
+    	        !organizer.getRole().equalsIgnoreCase("ORGANIZER")) {
+    	    throw new RuntimeException("Only Organizers Can Create Events");
+    	}
+
+    	if(organizer.getOrganizerStatus() == null ||
+    	        !organizer.getOrganizerStatus().equalsIgnoreCase("APPROVED")) {
+    	    throw new RuntimeException("Organizer Not Approved Yet");
+    	}
+
+    	if(!organizer.getRole().equalsIgnoreCase("ORGANIZER")) {
+    	    throw new RuntimeException("Only Organizers Can Create Events");
+    	}
+
+    	if(!organizer.getOrganizerStatus().equalsIgnoreCase("APPROVED")) {
+    	    throw new RuntimeException("Organizer Not Approved Yet");
+    	}
+
+        VenueDto venue = venueClient.getById(event.getVenueId());
+
+        if(venue == null) {
+            throw new RuntimeException("Venue Not Found");
+        }
+
+        if(eventRepo.existsByEventNameAndEventDateAndVenueId(
+                event.getEventName(),
+                event.getEventDate(),
+                event.getVenueId())) {
+
+            throw new RuntimeException("Same Event Already Exists In Same Venue On Same Date");
+        }
+
+        if(event.getEndTime().isBefore(event.getStartTime())) {
+            throw new RuntimeException("End Time Must Be Greater Than Start Time");
+        }
+
+        if(event.getTicketPrice() < 0) {
+            throw new RuntimeException("Ticket Price Cannot Be Negative");
+        }
+
+        if(event.getTotalTickets() <= 0) {
+            throw new RuntimeException("Total Tickets Must Be Greater Than Zero");
+        }
+
+        if(event.getAvailableTickets() > event.getTotalTickets()) {
+            throw new RuntimeException("Available Tickets Cannot Exceed Total Tickets");
+        }
+
+        List<Event> existingEvents =
+                eventRepo.findByVenueIdAndEventDate(
+                        event.getVenueId(),
+                        event.getEventDate());
+
+        for(Event existing : existingEvents) {
+
+            boolean overlap =
+                    event.getStartTime().isBefore(existing.getEndTime()) &&
+                    event.getEndTime().isAfter(existing.getStartTime());
+
+            if(overlap) {
+                throw new RuntimeException("Venue Already Occupied During This Time");
+            }
+        }
+
+        return eventRepo.save(event);
+    }
+
+    @Override
+    public Event updateEvent(Integer id, Event event) {
+
+        Event existingEvent = eventRepo.findById(id).orElse(null);
+
+        if(existingEvent != null) {
+            existingEvent.setEventName(event.getEventName());
+            existingEvent.setCategory(event.getCategory());
+            existingEvent.setDescription(event.getDescription());
+            existingEvent.setEventDate(event.getEventDate());
+            existingEvent.setStartTime(event.getStartTime());
+            existingEvent.setEndTime(event.getEndTime());
+            existingEvent.setVenueId(event.getVenueId());
+            existingEvent.setOrganizerId(event.getOrganizerId());
+            existingEvent.setEventType(event.getEventType());
+            existingEvent.setTicketPrice(event.getTicketPrice());
+            existingEvent.setTotalTickets(event.getTotalTickets());
+            existingEvent.setAvailableTickets(event.getAvailableTickets());
+            existingEvent.setStatus(event.getStatus());
+
+            return eventRepo.save(existingEvent);
+        }
+
+        return null;
+    }
+
+    @Override
+    public String deleteEvent(Integer id) {
+
+        eventRepo.deleteById(id);
+
+        return "Event Deleted Successfully";
+    }
+
+//    @Override
+//    public List<Event> viewAll() {
+//        return eventRepo.findAll();
+//    }
+    
+    @Override
+    public List<EventResponseDto> viewAll() {
+
+        List<Event> events = eventRepo.findAll();
+
+        return events.stream().map(event -> {
+
+            VenueDto venue = venueClient.getById(event.getVenueId());
+            UserDto organizer = userClient.getById(event.getOrganizerId());
+
+            EventResponseDto response = new EventResponseDto();
+
+            response.setEventId(event.getEventId());
+            response.setEventName(event.getEventName());
+            response.setCategory(event.getCategory());
+            response.setDescription(event.getDescription());
+            response.setEventDate(event.getEventDate());
+            response.setStartTime(event.getStartTime());
+            response.setEndTime(event.getEndTime());
+            response.setEventType(event.getEventType());
+            response.setTicketPrice(event.getTicketPrice());
+            response.setTotalTickets(event.getTotalTickets());
+            response.setAvailableTickets(event.getAvailableTickets());
+            response.setStatus(event.getStatus());
+
+            response.setVenue(venue);
+            response.setOrganizer(organizer);
+
+            return response;
+
+        }).collect(Collectors.toList());
+    }
+
+//    @Override
+//    public Event getById(Integer id) {
+//        return eventRepo.findById(id).orElse(null);
+//    }
+
+//    @Override
+//    public List<Event> getByName(String name) {
+//        return eventRepo.findByEventNameContaining(name);
+//    }
+    
+    @Override
+    public List<EventResponseDto> getByName(String name) {
+
+        List<Event> events = eventRepo.findByEventNameContaining(name);
+
+        return events.stream().map(event -> {
+
+            VenueDto venue = venueClient.getById(event.getVenueId());
+            UserDto organizer = userClient.getById(event.getOrganizerId());
+
+            EventResponseDto response = new EventResponseDto();
+
+            response.setEventId(event.getEventId());
+            response.setEventName(event.getEventName());
+            response.setCategory(event.getCategory());
+            response.setDescription(event.getDescription());
+            response.setEventDate(event.getEventDate());
+            response.setStartTime(event.getStartTime());
+            response.setEndTime(event.getEndTime());
+            response.setEventType(event.getEventType());
+            response.setTicketPrice(event.getTicketPrice());
+            response.setTotalTickets(event.getTotalTickets());
+            response.setAvailableTickets(event.getAvailableTickets());
+            response.setStatus(event.getStatus());
+
+            response.setVenue(venue);
+            response.setOrganizer(organizer);
+
+            return response;
+
+        }).collect(Collectors.toList());
+    }
+
+//    @Override
+//    public List<Event> getByCategory(String category) {
+//        return eventRepo.findByCategory(category);
+//    }
+    
+    @Override
+    public List<EventResponseDto> getByCategory(String category) {
+
+        List<Event> events = eventRepo.findByCategory(category);
+
+        return events.stream().map(event -> {
+
+            VenueDto venue = venueClient.getById(event.getVenueId());
+            UserDto organizer = userClient.getById(event.getOrganizerId());
+
+            EventResponseDto response = new EventResponseDto();
+
+            response.setEventId(event.getEventId());
+            response.setEventName(event.getEventName());
+            response.setCategory(event.getCategory());
+            response.setDescription(event.getDescription());
+            response.setEventDate(event.getEventDate());
+            response.setStartTime(event.getStartTime());
+            response.setEndTime(event.getEndTime());
+            response.setEventType(event.getEventType());
+            response.setTicketPrice(event.getTicketPrice());
+            response.setTotalTickets(event.getTotalTickets());
+            response.setAvailableTickets(event.getAvailableTickets());
+            response.setStatus(event.getStatus());
+
+            response.setVenue(venue);
+            response.setOrganizer(organizer);
+
+            return response;
+
+        }).collect(Collectors.toList());
+    }
+
+//    @Override
+//    public List<Event> getByDate(LocalDate date) {
+//        return eventRepo.findByEventDate(date);
+//    }
+    
+    @Override
+    public List<EventResponseDto> getByDate(LocalDate date) {
+
+        List<Event> events = eventRepo.findByEventDate(date);
+
+        return events.stream().map(event -> {
+
+            VenueDto venue = venueClient.getById(event.getVenueId());
+            UserDto organizer = userClient.getById(event.getOrganizerId());
+
+            EventResponseDto response = new EventResponseDto();
+
+            response.setEventId(event.getEventId());
+            response.setEventName(event.getEventName());
+            response.setCategory(event.getCategory());
+            response.setDescription(event.getDescription());
+            response.setEventDate(event.getEventDate());
+            response.setStartTime(event.getStartTime());
+            response.setEndTime(event.getEndTime());
+            response.setEventType(event.getEventType());
+            response.setTicketPrice(event.getTicketPrice());
+            response.setTotalTickets(event.getTotalTickets());
+            response.setAvailableTickets(event.getAvailableTickets());
+            response.setStatus(event.getStatus());
+
+            response.setVenue(venue);
+            response.setOrganizer(organizer);
+
+            return response;
+
+        }).collect(Collectors.toList());
+    }
+
+//    @Override
+//    public List<Event> getByVenue(Integer venueId) {
+//        return eventRepo.findByVenueId(venueId);
+//    }
+    
+    @Override
+    public List<EventResponseDto> getByVenue(Integer venueId) {
+
+        List<Event> events = eventRepo.findByVenueId(venueId);
+
+        return events.stream().map(event -> {
+
+            VenueDto venue = venueClient.getById(event.getVenueId());
+            UserDto organizer = userClient.getById(event.getOrganizerId());
+
+            EventResponseDto response = new EventResponseDto();
+
+            response.setEventId(event.getEventId());
+            response.setEventName(event.getEventName());
+            response.setCategory(event.getCategory());
+            response.setDescription(event.getDescription());
+            response.setEventDate(event.getEventDate());
+            response.setStartTime(event.getStartTime());
+            response.setEndTime(event.getEndTime());
+            response.setEventType(event.getEventType());
+            response.setTicketPrice(event.getTicketPrice());
+            response.setTotalTickets(event.getTotalTickets());
+            response.setAvailableTickets(event.getAvailableTickets());
+            response.setStatus(event.getStatus());
+
+            response.setVenue(venue);
+            response.setOrganizer(organizer);
+
+            return response;
+
+        }).collect(Collectors.toList());
+    }
+
+//    @Override
+//    public List<Event> getByOrganizer(Integer organizerId) {
+//        return eventRepo.findByOrganizerId(organizerId);
+//    }
+    
+    @Override
+    public List<EventResponseDto> getByOrganizer(Integer organizerId) {
+
+        List<Event> events = eventRepo.findByOrganizerId(organizerId);
+
+        return events.stream().map(event -> {
+
+            VenueDto venue = venueClient.getById(event.getVenueId());
+            UserDto organizer = userClient.getById(event.getOrganizerId());
+
+            EventResponseDto response = new EventResponseDto();
+
+            response.setEventId(event.getEventId());
+            response.setEventName(event.getEventName());
+            response.setCategory(event.getCategory());
+            response.setDescription(event.getDescription());
+            response.setEventDate(event.getEventDate());
+            response.setStartTime(event.getStartTime());
+            response.setEndTime(event.getEndTime());
+            response.setEventType(event.getEventType());
+            response.setTicketPrice(event.getTicketPrice());
+            response.setTotalTickets(event.getTotalTickets());
+            response.setAvailableTickets(event.getAvailableTickets());
+            response.setStatus(event.getStatus());
+
+            response.setVenue(venue);
+            response.setOrganizer(organizer);
+
+            return response;
+
+        }).collect(Collectors.toList());
+    }
+//    @Override
+//    public EventResponseDto getById(Integer id) {
+//
+//        Event event = eventRepo.findById(id).orElse(null);
+//
+//        VenueDto venue = venueClient.getById(event.getVenueId());
+//        UserDto organizer = userClient.getById(event.getOrganizerId());
+//
+//        EventResponseDto response = new EventResponseDto();
+//
+//        response.setEventId(event.getEventId());
+//        response.setEventName(event.getEventName());
+//        response.setCategory(event.getCategory());
+//        response.setDescription(event.getDescription());
+//        response.setEventDate(event.getEventDate());
+//        response.setStartTime(event.getStartTime());
+//        response.setEndTime(event.getEndTime());
+//        response.setEventType(event.getEventType());
+//        response.setTicketPrice(event.getTicketPrice());
+//        response.setTotalTickets(event.getTotalTickets());
+//        response.setAvailableTickets(event.getAvailableTickets());
+//        response.setStatus(event.getStatus());
+//
+//        response.setVenue(venue);
+//        response.setOrganizer(organizer);
+//
+//        return response;
+//        
+//    }
+    @Override
+    public EventResponseDto getById(Integer id) {
+
+        Event event = eventRepo.findById(id).orElse(null);
+
+        VenueDto venue = venueClient.getById(event.getVenueId());
+        UserDto organizer = userClient.getById(event.getOrganizerId());
+
+        EventResponseDto response = new EventResponseDto();
+
+        response.setEventId(event.getEventId());
+        response.setEventName(event.getEventName());
+        response.setCategory(event.getCategory());
+        response.setDescription(event.getDescription());
+        response.setEventDate(event.getEventDate());
+        response.setStartTime(event.getStartTime());
+        response.setEndTime(event.getEndTime());
+        response.setEventType(event.getEventType());
+        response.setTicketPrice(event.getTicketPrice());
+        response.setTotalTickets(event.getTotalTickets());
+        response.setAvailableTickets(event.getAvailableTickets());
+        response.setStatus(event.getStatus());
+
+        response.setVenue(venue);
+        response.setOrganizer(organizer);
+
+        return response;
+        
+    }
+    
+    @Override
+    public Event increaseAvailableTickets(Integer id, Integer tickets) {
+
+        Event event = eventRepo.findById(id).orElse(null);
+
+        if(event == null) {
+            throw new RuntimeException("Event Not Found");
+        }
+
+        event.setAvailableTickets(event.getAvailableTickets() + tickets);
+
+        if(event.getAvailableTickets() > event.getTotalTickets()) {
+            event.setAvailableTickets(event.getTotalTickets());
+        }
+
+        return eventRepo.save(event);
+    }
+    
+    @Override
+    public Event getEventEntityById(Integer id) {
+
+        return eventRepo.findById(id).orElse(null);
+    }
+
+    @Override
+    public Event reduceAvailableTickets(Integer id, Integer tickets) {
+
+        Event event = eventRepo.findById(id).orElse(null);
+
+        if(event == null) {
+            throw new RuntimeException("Event Not Found");
+        }
+
+        if(event.getAvailableTickets() < tickets) {
+            throw new RuntimeException("Not Enough Tickets Available");
+        }
+
+        event.setAvailableTickets(event.getAvailableTickets() - tickets);
+
+        return eventRepo.save(event);
+    }
+    
+  
+}

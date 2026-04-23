@@ -1,0 +1,22 @@
+package com.auth.service.service;
+
+import java.util.List;
+
+import com.auth.service.dto.RegisterRequest;
+import com.auth.service.entity.Auth;
+
+public interface AuthService {
+
+	Auth register(RegisterRequest request);
+
+	String login(String email, String password);
+
+	List<Auth> viewAll();
+
+	Auth getById(Integer id);
+
+	Auth getByEmail(String email);
+
+	String deleteUser(Integer id);
+
+}

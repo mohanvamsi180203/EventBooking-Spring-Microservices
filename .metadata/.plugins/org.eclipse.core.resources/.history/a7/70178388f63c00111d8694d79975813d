@@ -1,0 +1,30 @@
+package com.auth.service.service;
+
+import java.util.List;
+
+import com.auth.service.dto.VerifyOtpRequest;
+import com.auth.service.entity.Auth;
+
+public interface AuthService {
+
+    Auth register(Auth auth);
+
+    String login(String email, String password);
+
+    List<Auth> viewAll();
+
+    Auth getById(Integer id);
+
+    Auth getByEmail(String email);
+
+    String deleteUser(Integer id);
+    
+    
+    String verifyOtp(VerifyOtpRequest request);
+
+    String applyOrganizer(Integer userId);
+
+    String approveOrganizer(Integer userId);
+
+    String rejectOrganizer(Integer userId);
+}

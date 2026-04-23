@@ -1,0 +1,13 @@
+package com.seat.service.service;
+public interface SeatService {
+
+    List<Seat> createSeats(SeatCreateRequest request);
+
+    List<Seat> getSeatsByEvent(Integer eventId);
+
+    List<Seat> lockSeats(Integer userId, List<Integer> seatIds);
+
+    List<Seat> confirmSeats(List<Integer> seatIds);
+
+    List<Seat> releaseSeats(List<Integer> seatIds);
+}

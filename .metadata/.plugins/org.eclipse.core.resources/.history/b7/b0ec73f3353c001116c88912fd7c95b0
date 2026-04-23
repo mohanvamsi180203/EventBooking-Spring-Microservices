@@ -1,0 +1,27 @@
+@RestController
+@RequestMapping("/api/ticket")
+public class TicketController {
+
+    @Autowired
+    private TicketService ticketService;
+
+    @PostMapping("/generate/{bookingId}")
+    public TicketResponseDto generateTicket(@PathVariable Integer bookingId) {
+        return ticketService.generateTicket(bookingId);
+    }
+
+    @GetMapping("/getByBooking/{bookingId}")
+    public TicketResponseDto getByBooking(@PathVariable Integer bookingId) {
+        return ticketService.getByBooking(bookingId);
+    }
+
+    @PutMapping("/verify/{qrCodeText}")
+    public TicketResponseDto verifyTicket(@PathVariable String qrCodeText) {
+        return ticketService.verifyTicket(qrCodeText);
+    }
+
+    @GetMapping("/view")
+    public List<TicketResponseDto> viewAll() {
+        return ticketService.viewAll();
+    }
+}

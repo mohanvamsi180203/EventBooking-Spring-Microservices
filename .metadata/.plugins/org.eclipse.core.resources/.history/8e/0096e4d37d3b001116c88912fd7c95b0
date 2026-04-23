@@ -1,0 +1,15 @@
+package com.organizer.dashboard.service.controller;
+@RestController
+@RequestMapping("/api/dashboard")
+public class OrganizerDashboardController {
+
+    @Autowired
+    private OrganizerDashboardService organizerDashboardService;
+
+    @GetMapping("/organizer/{organizerId}")
+    public OrganizerDashboardResponseDto getDashboard(
+            @PathVariable Integer organizerId) {
+
+        return organizerDashboardService.getDashboard(organizerId);
+    }
+}

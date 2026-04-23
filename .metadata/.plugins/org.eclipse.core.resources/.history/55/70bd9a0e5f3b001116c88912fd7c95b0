@@ -1,0 +1,92 @@
+package com.user.service.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.user.service.client.AuthClient;
+import com.user.service.dto.AuthDto;
+import com.user.service.entity.User;
+import com.user.service.repo.UserRepo;
+
+@Service
+public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private UserRepo userRepo;
+
+    @Autowired
+    private AuthClient authClient;
+
+    @Override
+    public User addUser(User user) {
+
+        AuthDto auth = authClient.getById(user.getAuthId());
+
+        if(auth == null) {
+            throw new RuntimeException("Auth Record Not Found");
+        }
+
+        if(userRepo.existsByEmail(user.getEmail())) {
+            throw new RuntimeException("Email Already Exists");
+        }
+
+        if(user.getPhone().length() != 10) {
+            throw new RuntimeException("Phone Number Must Be 10 Digits");
+        }
+
+        return userRepo.save(user);
+    }
+
+    @Override
+    public User updateUser(Integer id, User user) {
+
+        User existingUser = userRepo.findById(id).orElse(null);
+
+        if(existingUser != null) {
+            existingUser.setName(user.getName());
+            existingUser.setEmail(user.getEmail());
+            existingUser.setPhone(user.getPhone());
+            existingUser.setCity(user.getCity());
+            existingUser.setStatus(user.getStatus());
+
+            return userRepo.save(existingUser);
+        }
+
+        return null;
+    }
+
+    @Override
+    public String deleteUser(Integer id) {
+
+        User user = userRepo.deleteById(id);
+
+        return "User Deleted Successfully";
+    }
+
+    @Override
+    public List<User> viewAll() {
+        return userRepo.findAll();
+    }
+
+    @Override
+    public User getById(Integer id) {
+        return userRepo.findById(id).orElse(null);
+    }
+
+    @Override
+    public User getByEmail(String email) {
+        return userRepo.findByEmail(email);
+    }
+
+    @Override
+    public List<User> getByName(String name) {
+        return userRepo.findByNameContaining(name);
+    }
+
+    @Override
+    public List<User> getByCity(String city) {
+        return userRepo.findByCity(city);
+    }
+}

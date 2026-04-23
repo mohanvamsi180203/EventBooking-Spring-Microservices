@@ -1,0 +1,8 @@
+package com.auth.service.dto;
+
+public class LoginRequest {
+
+	private String email;
+	private String password;
+
+}

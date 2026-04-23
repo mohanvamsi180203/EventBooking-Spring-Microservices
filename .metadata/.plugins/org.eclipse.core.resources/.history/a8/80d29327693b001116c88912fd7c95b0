@@ -1,0 +1,24 @@
+package com.user.service.service;
+
+import java.util.List;
+
+import com.user.service.entity.User;
+
+public interface UserService {
+
+    User addUser(User user);
+
+    User updateUser(Integer id, User user);
+
+    String deleteUser(Integer id);
+
+    List<User> viewAll();
+
+    User getById(Integer id);
+
+    User getByEmail(String email);
+
+    List<User> getByName(String name);
+
+    List<User> getByCity(String city);
+}

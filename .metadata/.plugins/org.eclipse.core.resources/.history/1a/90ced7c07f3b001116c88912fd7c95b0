@@ -1,0 +1,98 @@
+package com.recommendation.service.service;
+@Service
+public class RecommendationServiceImpl implements RecommendationService {
+
+    @Autowired
+    private UserClient userClient;
+
+    @Autowired
+    private EventClient eventClient;
+
+    @Autowired
+    private BookingClient bookingClient;
+
+    @Autowired
+    private WishlistClient wishlistClient;
+
+    @Override
+    public List<RecommendationResponseDto> getRecommendations(Integer userId) {
+
+        UserDto user = userClient.getUserEntityById(userId);
+
+        if(user == null) {
+            throw new RuntimeException("User Not Found");
+        }
+
+        List<EventDto> allEvents = eventClient.viewAll();
+
+        List<BookingDto> bookings = bookingClient.getByUser(userId);
+
+        List<WishlistDto> wishlists = wishlistClient.getByUser(userId);
+
+        Set<Integer> alreadySeenEventIds = new HashSet<>();
+        Set<String> interestedCategories = new HashSet<>();
+
+        for(BookingDto booking : bookings) {
+
+            if(booking.getEvent() != null) {
+                alreadySeenEventIds.add(booking.getEvent().getEventId());
+                interestedCategories.add(booking.getEvent().getCategory());
+            }
+        }
+
+        for(WishlistDto wishlist : wishlists) {
+
+            if(wishlist.getEvent() != null) {
+                alreadySeenEventIds.add(wishlist.getEvent().getEventId());
+                interestedCategories.add(wishlist.getEvent().getCategory());
+            }
+        }
+
+        List<RecommendationResponseDto> recommendations = new ArrayList<>();
+
+        for(EventDto event : allEvents) {
+
+            if(alreadySeenEventIds.contains(event.getEventId())) {
+                continue;
+            }
+
+            if(event.getStatus().equals("CANCELLED")) {
+                continue;
+            }
+
+            if(event.getStatus().equals("COMPLETED")) {
+                continue;
+            }
+
+            RecommendationResponseDto response = new RecommendationResponseDto();
+
+            response.setEventId(event.getEventId());
+            response.setEventName(event.getEventName());
+            response.setCategory(event.getCategory());
+
+            if(event.getVenue() != null) {
+                response.setCity(event.getVenue().getLocation());
+            }
+
+            if(interestedCategories.contains(event.getCategory())) {
+
+                response.setReason(
+                        "Because you booked or saved similar " +
+                        event.getCategory() +
+                        " events");
+
+                recommendations.add(response);
+            }
+            else if(event.getVenue() != null &&
+                    event.getVenue().getLocation().equalsIgnoreCase(user.getCity())) {
+
+                response.setReason(
+                        "Because this event is happening in your city");
+
+                recommendations.add(response);
+            }
+        }
+
+        return recommendations;
+    }
+}

@@ -1,0 +1,150 @@
+package com.auth.service.service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.auth.service.entity.Auth;
+import com.auth.service.repo.AuthRepo;
+
+@Service
+public class AuthServiceImpl implements AuthService {
+
+    @Autowired
+    private AuthRepo authRepo;
+
+//    @Override
+//    public Auth register(Auth auth) {
+//
+//        if(authRepo.existsByEmail(auth.getEmail())) {
+//            throw new RuntimeException("Email Already Exists");
+//        }
+//
+//        if(authRepo.existsByUsername(auth.getUsername())) {
+//            throw new RuntimeException("Username Already Exists");
+//        }
+//
+//        if(auth.getPassword().length() < 6) {
+//            throw new RuntimeException("Password Must Be At Least 6 Characters");
+//        }
+//        
+//        
+//        String otp = generateOtp();
+//
+//        auth.setOtp(otp);
+//        auth.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
+//        auth.setEmailVerified(false);
+//  
+//
+//        return authRepo.save(auth);
+//    }
+
+    @Override
+    public Auth register(Auth auth) {
+
+        if(authRepo.existsByEmail(auth.getEmail())) {
+            throw new RuntimeException("Email Already Exists");
+        }
+
+        if(authRepo.existsByUsername(auth.getUsername())) {
+            throw new RuntimeException("Username Already Exists");
+        }
+
+        if(auth.getPassword().length() < 6) {
+            throw new RuntimeException("Password Must Be At Least 6 Characters");
+        }
+
+        String otp = generateOtp();
+
+        auth.setOtp(otp);
+        auth.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
+        auth.setEmailVerified(false);
+        auth.setRole("USER");
+        auth.setOrganizerStatus(null);
+
+        Auth savedAuth = authRepo.save(auth);
+
+        NotificationDto notification = new NotificationDto();
+
+        notification.setUserId(savedAuth.getUserId());
+        notification.setNotificationType("EMAIL_VERIFICATION");
+        notification.setMessage(
+                "Welcome to Event Booking Platform.\n\n" +
+                "Your OTP for email verification is: " + otp +
+                "\n\nThis OTP will expire in 5 minutes."
+        );
+
+        notificationClient.sendNotification(notification);
+
+        return savedAuth;
+    }
+    @Override
+    public String login(String email, String password) {
+
+        Auth auth = authRepo.findByEmail(email);
+
+        if(auth != null && auth.getPassword().equals(password)) {
+            return "Login Successful";
+        }
+
+        return "Invalid Email Or Password";
+    }
+
+    @Override
+    public List<Auth> viewAll() {
+        return authRepo.findAll();
+    }
+
+    @Override
+    public Auth getById(Integer id) {
+        return authRepo.findById(id).orElse(null);
+    }
+
+    @Override
+    public Auth getByEmail(String email) {
+        return authRepo.findByEmail(email);
+    }
+
+    @Override
+    public String deleteUser(Integer id) {
+        authRepo.deleteById(id);
+        return "User Deleted Successfully";
+    }
+    
+    
+    private String generateOtp() {
+        return String.valueOf((int)(Math.random() * 900000) + 100000);
+    }
+    
+    @Override
+    public String verifyOtp(VerifyOtpRequest request) {
+
+        Auth user = authRepo.findByEmail(request.getEmail());
+
+        if(user == null) {
+            throw new RuntimeException("User Not Found");
+        }
+
+        if(user.getEmailVerified() != null && user.getEmailVerified()) {
+            throw new RuntimeException("Email Already Verified");
+        }
+
+        if(!user.getOtp().equals(request.getOtp())) {
+            throw new RuntimeException("Invalid OTP");
+        }
+
+        if(user.getOtpExpiry().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("OTP Expired");
+        }
+
+        user.setEmailVerified(true);
+        user.setOtp(null);
+        user.setOtpExpiry(null);
+
+        authRepo.save(user);
+
+        return "Email Verified Successfully";
+    }
+}

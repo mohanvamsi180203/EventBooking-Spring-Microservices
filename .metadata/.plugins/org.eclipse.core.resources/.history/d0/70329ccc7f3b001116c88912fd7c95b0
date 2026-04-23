@@ -1,0 +1,15 @@
+package com.recommendation.service.controller;
+@RestController
+@RequestMapping("/api/recommendation")
+public class RecommendationController {
+
+    @Autowired
+    private RecommendationService recommendationService;
+
+    @GetMapping("/getByUser/{userId}")
+    public List<RecommendationResponseDto> getRecommendations(
+            @PathVariable Integer userId) {
+
+        return recommendationService.getRecommendations(userId);
+    }
+}

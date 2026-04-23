@@ -1,0 +1,46 @@
+package com.search.service.controller;
+@RestController
+@RequestMapping("/api/search")
+public class SearchController {
+
+    @Autowired
+    private SearchService searchService;
+
+    @GetMapping("/byName/{name}")
+    public List<SearchResponseDto> searchByName(@PathVariable String name) {
+        return searchService.searchByName(name);
+    }
+
+    @GetMapping("/byCategory/{category}")
+    public List<SearchResponseDto> searchByCategory(@PathVariable String category) {
+        return searchService.searchByCategory(category);
+    }
+
+    @GetMapping("/byCity/{city}")
+    public List<SearchResponseDto> searchByCity(@PathVariable String city) {
+        return searchService.searchByCity(city);
+    }
+
+    @GetMapping("/byDate/{date}")
+    public List<SearchResponseDto> searchByDate(@PathVariable LocalDate date) {
+        return searchService.searchByDate(date);
+    }
+
+    @GetMapping("/byPrice/{min}/{max}")
+    public List<SearchResponseDto> searchByPrice(
+            @PathVariable Double min,
+            @PathVariable Double max) {
+
+        return searchService.searchByPrice(min, max);
+    }
+
+    @GetMapping("/byStatus/{status}")
+    public List<SearchResponseDto> searchByStatus(@PathVariable String status) {
+        return searchService.searchByStatus(status);
+    }
+
+    @GetMapping("/byType/{eventType}")
+    public List<SearchResponseDto> searchByType(@PathVariable String eventType) {
+        return searchService.searchByType(eventType);
+    }
+}

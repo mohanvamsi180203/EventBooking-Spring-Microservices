@@ -1,0 +1,7 @@
+package com.event.service.client;
+@FeignClient(name = "AUTH-SERVICE")
+public interface AuthClient {
+
+    @GetMapping("/api/auth/get/{id}")
+    UserDto getById(@PathVariable("id") Integer id);
+}

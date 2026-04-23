@@ -1,0 +1,7 @@
+package com.qrticket.service.repo;
+public interface TicketRepo extends JpaRepository<Ticket, Integer> {
+
+    Ticket findByBookingId(Integer bookingId);
+
+    Ticket findByQrCodeText(String qrCodeText);
+}

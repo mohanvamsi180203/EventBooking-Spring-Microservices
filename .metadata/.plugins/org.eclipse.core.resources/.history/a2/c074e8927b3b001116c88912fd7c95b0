@@ -1,0 +1,7 @@
+package com.wishlist.service.client;
+@FeignClient(name = "USER-SERVICE")
+public interface UserClient {
+
+    @GetMapping("/api/user/getEntity/{id}")
+    UserDto getUserEntityById(@PathVariable Integer id);
+}

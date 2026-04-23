@@ -1,0 +1,22 @@
+package com.venue.service.service;
+
+import java.util.List;
+
+import com.venue.service.entity.Venue;
+
+public interface VenueService {
+
+    Venue addVenue(Venue venue);
+
+    Venue updateVenue(Integer id, Venue venue);
+
+    String deleteVenue(Integer id);
+
+    List<Venue> viewAll();
+
+    Venue getById(Integer id);
+
+    List<Venue> getByName(String name);
+
+    List<Venue> getByLocation(String location);
+}

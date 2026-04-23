@@ -1,0 +1,108 @@
+package com.notification.service.service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.notification.service.client.UserClient;
+import com.notification.service.dto.NotificationResponseDto;
+import com.notification.service.dto.UserDto;
+import com.notification.service.entity.Notification;
+import com.notification.service.repo.NotificationRepo;
+
+@Service
+public class NotificationServiceImpl implements NotificationService {
+
+    @Autowired
+    private NotificationRepo notificationRepo;
+
+    @Autowired
+    private UserClient userClient;
+
+    @Override
+    public NotificationResponseDto sendNotification(Notification notification) {
+
+        UserDto user = userClient.getUserEntityById(notification.getUserId());
+
+        if(user == null) {
+            throw new RuntimeException("User Not Found");
+        }
+
+        notification.setCreatedAt(LocalDateTime.now());
+        notification.setStatus("UNREAD");
+
+        Notification savedNotification = notificationRepo.save(notification);
+
+        return mapNotification(savedNotification);
+    }
+
+    @Override
+    public List<NotificationResponseDto> viewAll() {
+
+        List<Notification> notifications = notificationRepo.findAll();
+
+        return notifications.stream().map(this::mapNotification)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public NotificationResponseDto getById(Integer id) {
+
+        Notification notification = notificationRepo.findById(id).orElse(null);
+
+        return mapNotification(notification);
+    }
+
+    @Override
+    public List<NotificationResponseDto> getByUser(Integer userId) {
+
+        List<Notification> notifications = notificationRepo.findByUserId(userId);
+
+        return notifications.stream().map(this::mapNotification)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<NotificationResponseDto> getByStatus(String status) {
+
+        List<Notification> notifications = notificationRepo.findByStatus(status);
+
+        return notifications.stream().map(this::mapNotification)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public NotificationResponseDto markAsRead(Integer id) {
+
+        Notification notification = notificationRepo.findById(id).orElse(null);
+
+        if(notification == null) {
+            throw new RuntimeException("Notification Not Found");
+        }
+
+        notification.setStatus("READ");
+
+        Notification savedNotification = notificationRepo.save(notification);
+
+        return mapNotification(savedNotification);
+    }
+
+    private NotificationResponseDto mapNotification(Notification notification) {
+
+        UserDto user = userClient.getUserEntityById(notification.getUserId());
+
+        NotificationResponseDto response = new NotificationResponseDto();
+
+        response.setNotificationId(notification.getNotificationId());
+        response.setMessage(notification.getMessage());
+        response.setNotificationType(notification.getNotificationType());
+        response.setCreatedAt(notification.getCreatedAt());
+        response.setStatus(notification.getStatus());
+        response.setUser(user);
+
+        return response;
+    }
+}

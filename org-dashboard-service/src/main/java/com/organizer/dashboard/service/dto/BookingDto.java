@@ -1,0 +1,18 @@
+package com.organizer.dashboard.service.dto;
+
+import java.time.LocalDate;
+
+import lombok.Data;
+
+
+@Data
+public class BookingDto {
+
+    private Integer bookingId;
+    private Integer quantity;
+    private Double totalAmount;
+    private LocalDate bookingDate;
+    private String bookingStatus;
+
+    private EventDto event;
+}

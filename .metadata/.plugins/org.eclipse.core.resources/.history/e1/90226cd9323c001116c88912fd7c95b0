@@ -1,0 +1,7 @@
+package com.reportanalytics.service.client;
+@FeignClient(name = "REFUND-SERVICE")
+public interface RefundClient {
+
+    @GetMapping("/api/refund/view")
+    List<RefundDto> viewAll();
+}

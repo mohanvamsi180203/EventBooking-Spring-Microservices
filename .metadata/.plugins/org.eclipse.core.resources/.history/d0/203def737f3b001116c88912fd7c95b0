@@ -1,0 +1,9 @@
+package com.recommendation.servicedto;
+public class WishlistDto {
+
+    private Integer wishlistId;
+    private LocalDate addedDate;
+
+    private UserDto user;
+    private EventDto event;
+}

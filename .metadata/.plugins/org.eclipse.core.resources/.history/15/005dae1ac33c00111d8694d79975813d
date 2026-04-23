@@ -1,0 +1,17 @@
+package com.booking.service.client;
+@FeignClient(name = "SEAT-SERVICE")
+public interface SeatClient {
+
+    @PutMapping("/api/seat/lock/{userId}")
+    List<SeatDto> lockSeats(
+            @PathVariable("userId") Integer userId,
+            @RequestBody List<Integer> seatIds);
+
+    @PutMapping("/api/seat/confirm")
+    List<SeatDto> confirmSeats(
+            @RequestBody List<Integer> seatIds);
+
+    @PutMapping("/api/seat/release")
+    List<SeatDto> releaseSeats(
+            @RequestBody List<Integer> seatIds);
+}

@@ -1,0 +1,29 @@
+package com.event.service.service;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import com.event.service.entity.Event;
+
+public interface EventService {
+
+    Event addEvent(Event event);
+
+    Event updateEvent(Integer id, Event event);
+
+    String deleteEvent(Integer id);
+
+    List<Event> viewAll();
+
+    EventResponseDto getById(Integer id);
+
+    List<Event> getByName(String name);
+
+    List<Event> getByCategory(String category);
+
+    List<Event> getByDate(LocalDate date);
+
+    List<Event> getByVenue(Integer venueId);
+
+    List<Event> getByOrganizer(Integer organizerId);
+}

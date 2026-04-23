@@ -1,0 +1,6 @@
+@FeignClient(name = "QR-TICKET-SERVICE")
+public interface TicketClient {
+
+    @PostMapping("/api/ticket/generate/{bookingId}")
+    TicketResponseDto generateTicket(@PathVariable("bookingId") Integer bookingId);
+}

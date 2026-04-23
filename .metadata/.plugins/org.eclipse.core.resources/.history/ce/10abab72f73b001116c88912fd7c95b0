@@ -1,0 +1,10 @@
+package com.refund.service.client;
+@FeignClient(name = "BOOKING-SERVICE")
+public interface BookingClient {
+
+    @GetMapping("/api/booking/get/{id}")
+    BookingDto getById(@PathVariable("id") Integer id);
+
+    @PutMapping("/api/booking/cancel/{id}")
+    BookingDto cancelBooking(@PathVariable("id") Integer id);
+}

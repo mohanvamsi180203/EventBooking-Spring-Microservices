@@ -1,0 +1,6 @@
+@FeignClient(name = "PAYMENT-SERVICE")
+public interface PaymentClient {
+
+    @GetMapping("/api/payment/getByBooking/{bookingId}")
+    PaymentDto getByBooking(@PathVariable("bookingId") Integer bookingId);
+}

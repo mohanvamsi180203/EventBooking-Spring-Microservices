@@ -1,0 +1,13 @@
+package com.recommendation.service.dto;
+
+import lombok.Data;
+
+@Data
+public class RecommendationResponseDto {
+
+    private Integer eventId;
+    private String eventName;
+    private String category;
+    private String city;
+    private String reason;
+}

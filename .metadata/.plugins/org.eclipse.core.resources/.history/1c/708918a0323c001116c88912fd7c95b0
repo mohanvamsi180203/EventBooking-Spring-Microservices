@@ -1,0 +1,8 @@
+package com.reportanalytics.service.dto;
+@Data
+@AllArgsConstructor
+public class CategoryReportDto {
+
+    private String category;
+    private Long count;
+}

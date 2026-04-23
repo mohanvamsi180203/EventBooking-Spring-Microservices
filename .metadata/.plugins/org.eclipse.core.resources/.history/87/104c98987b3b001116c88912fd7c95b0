@@ -1,0 +1,6 @@
+@FeignClient(name = "EVENT-SERVICE")
+public interface EventClient {
+
+    @GetMapping("/api/event/getEntity/{id}")
+    EventDto getEventEntityById(@PathVariable Integer id);
+}

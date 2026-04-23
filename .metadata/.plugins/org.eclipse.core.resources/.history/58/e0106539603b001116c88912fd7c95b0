@@ -1,0 +1,12 @@
+@Entity
+public class Venue {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer venueId;
+
+    private String venueName;
+    private String location;
+    private Integer capacity;
+    private String venueType;
+}

@@ -1,0 +1,28 @@
+package com.refund.service.entity;
+
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.Data;
+
+@Entity
+@Data
+public class Refund {
+
+	
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer refundId;
+
+    private Integer bookingId;
+    private Integer paymentId;
+    private Integer userId;
+    private Double refundAmount;
+    private String refundReason;
+    private String refundStatus;
+    private LocalDateTime requestedAt;
+    private LocalDateTime refundedAt;
+}

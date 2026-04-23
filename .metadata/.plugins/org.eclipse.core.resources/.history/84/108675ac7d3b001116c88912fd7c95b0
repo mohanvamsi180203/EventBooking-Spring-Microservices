@@ -1,0 +1,6 @@
+@FeignClient(name = "EVENT-SERVICE")
+public interface EventClient {
+
+    @GetMapping("/api/event/getByOrganizer/{organizerId}")
+    List<EventDto> getByOrganizer(@PathVariable Integer organizerId);
+}

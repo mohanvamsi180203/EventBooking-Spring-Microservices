@@ -1,0 +1,4 @@
+public interface RecommendationService {
+
+    List<RecommendationResponseDto> getRecommendations(Integer userId);
+}

@@ -1,0 +1,15 @@
+package com.user.service.entiry;
+@Entity
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer userId;
+
+    private Integer authId;
+    private String name;
+    private String email;
+    private String phone;
+    private String city;
+    private String status;
+}

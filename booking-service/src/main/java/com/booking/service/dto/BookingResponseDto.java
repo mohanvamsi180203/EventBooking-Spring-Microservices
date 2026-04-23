@@ -1,0 +1,32 @@
+package com.booking.service.dto;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import lombok.Data;
+
+@Data
+public class BookingResponseDto {
+
+    private Integer bookingId;
+    private Integer quantity;
+    private Double totalAmount;
+    private LocalDate bookingDate;
+    private String bookingStatus;
+    private LocalDateTime lockedUntil;
+
+    private UserDto user;
+    private EventDto event;
+    private VenueDto venue;
+    private UserDto organizer;
+    private Integer userId;
+    private Integer eventId;
+
+    private String eventName;
+    private String category;
+    private String city;
+    private LocalDate eventDate;
+    private String venueName;
+    
+
+}

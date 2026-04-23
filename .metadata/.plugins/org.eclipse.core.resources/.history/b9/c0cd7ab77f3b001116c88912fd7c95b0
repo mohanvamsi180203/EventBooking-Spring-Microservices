@@ -1,0 +1,15 @@
+package com.recommendation.servicedto;
+
+
+import java.time.LocalDate;
+
+import lombok.Data;
+@Data
+public class WishlistDto {
+
+    private Integer wishlistId;
+    private LocalDate addedDate;
+
+    private UserDto user;
+    private EventDto event;
+}

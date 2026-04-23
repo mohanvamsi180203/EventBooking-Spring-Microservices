@@ -1,0 +1,7 @@
+package com.recommendation.service.client;
+@FeignClient(name = "WISHLIST-SERVICE")
+public interface WishlistClient {
+
+    @GetMapping("/api/wishlist/getByUser/{userId}")
+    List<WishlistDto> getByUser(@PathVariable Integer userId);
+}
